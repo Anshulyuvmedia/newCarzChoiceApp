@@ -43,7 +43,7 @@ const Support = () => {
         <SafeAreaView>
             <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="pb-32 px-7">
                 {loading ? (
-                    <ActivityIndicator size="large" color="#0061ff" style={{ marginTop: 400 }} />
+                    <ActivityIndicator size="large" color="#a62325" style={{ marginTop: 400 }} />
                 ) : (
                     <View>
                         <Toast config={toastConfig} position="top" />

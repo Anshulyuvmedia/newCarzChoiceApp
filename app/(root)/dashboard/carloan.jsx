@@ -251,7 +251,7 @@ const CarLoan = () => {
     return (
         <SafeAreaView style={{ flex: 1 }}>
             {loading ? (
-                <ActivityIndicator size="large" color="#0061ff" style={{ marginTop: 400 }} />
+                <ActivityIndicator size="large" color="#a62325" style={{ marginTop: 400 }} />
             ) : (
                 <View style={{ flex: 1, paddingHorizontal: 20 }}>
                     <View className="flex flex-row items-center justify-between my-5">
@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     submitButton: {
-        backgroundColor: '#0061ff',
+        backgroundColor: '#a62325',
         padding: 15,
         borderRadius: 8,
         alignItems: 'center',

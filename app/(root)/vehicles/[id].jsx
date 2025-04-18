@@ -290,7 +290,7 @@ const CarDetails = () => {
 
     // ✅ Loading State
     if (loading) {
-        return <ActivityIndicator size="large" color="#0061ff" style={{ marginTop: 400 }} />;
+        return <ActivityIndicator size="large" color="#a62325" style={{ marginTop: 400 }} />;
     }
 
     // ✅ Error State
@@ -498,7 +498,7 @@ const CarDetails = () => {
                         onPress={() => refRBSheet.current.open()}
                         style={{
                             backgroundColor: "white",
-                            borderColor: "#0061FF",
+                            borderColor: "#a62325",
                             borderWidth: 2,
                             paddingHorizontal: 20,
                             paddingVertical: 12,
@@ -506,7 +506,7 @@ const CarDetails = () => {
                             marginBottom: 20,
                         }}
                     >
-                        <Text style={{ color: "#0061FF", fontSize: 16, textAlign: 'center', fontWeight: 600 }}>🧮 Calculate Your EMI</Text>
+                        <Text style={{ color: "#a62325", fontSize: 16, textAlign: 'center', fontWeight: 600 }}>🧮 Calculate Your EMI</Text>
                     </TouchableOpacity>,
 
                     <RBSheet
