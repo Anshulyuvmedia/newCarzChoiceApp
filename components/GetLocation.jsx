@@ -100,7 +100,7 @@ const GetLocation = () => {
     return (
         <View>
             <TouchableOpacity onPress={() => refRBSheet.current.open()} className='flex flex-row items-center ml-2 justify-center'>
-                <View style={{ padding: 20 }}>
+                <View>
                     {errorMsg ? (
                         <Text className="text-red-500">{errorMsg}</Text>
                     ) : displayCity ? (
@@ -120,7 +120,7 @@ const GetLocation = () => {
 
             <RBSheet
                 ref={refRBSheet}
-                height={550}
+                height={600}
                 openDuration={150}
                 closeOnDragDown
                 customStyles={{

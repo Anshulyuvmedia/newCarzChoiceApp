@@ -3,7 +3,7 @@ import { Image, Text, View } from "react-native";
 
 import icons from "@/constants/icons";
 
-const TabIcon = ({focused, icon, title}) => (
+const TabIcon = ({ focused, icon, title }) => (
     <View className="flex-1 mt-3 flex flex-col items-center">
         <Image
             source={icon}
@@ -57,23 +57,12 @@ const TabsLayout = () => {
                 }}
             />
             <Tabs.Screen
-                name="myvehicles"
+                name="dealers"
                 options={{
-                    title: "My Vehicles",
+                    title: "Dealers",
                     headerShown: false,
                     tabBarIcon: ({ focused }) => (
-                        <TabIcon focused={focused} icon={icons.showroom} title="My Vehicles" />
-                    ),
-                }}
-            />
-            
-            <Tabs.Screen
-                name="sellvehicle"
-                options={{
-                    title: "Sell Car",
-                    headerShown: false,
-                    tabBarIcon: ({ focused }) => (
-                        <TabIcon focused={focused} icon={icons.sell} title="Sell Car" />
+                        <TabIcon focused={focused} icon={icons.sell} title="Dealers" />
                     ),
                 }}
             />
@@ -87,7 +76,7 @@ const TabsLayout = () => {
                     ),
                 }}
             />
-            
+
         </Tabs>
     );
 };

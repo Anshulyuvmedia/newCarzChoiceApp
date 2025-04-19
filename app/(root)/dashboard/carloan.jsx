@@ -8,6 +8,7 @@ import RNPickerSelect from 'react-native-picker-select';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
+import CitySelector from '../../../components/CitySelector';
 
 const CarLoan = () => {
     const [loading, setLoading] = useState(false);
@@ -206,15 +207,15 @@ const CarLoan = () => {
             const carName = `${selectedBrand}, ${selectedModal}, ${selectedVariant}`;
             formData.append("carname", carName);
             formData.append("cityname", city);
-            formData.append("enquirytype", 'oldcar');
+            formData.append("enquirytype", 'newcar');
 
             formData.append("fullname", userData.fullname);
             formData.append("mobileno", userData.contactno);
 
-            console.log("Uploading FormData:");
-            for (let pair of formData.entries()) {
-                console.log(pair[0], pair[1]);
-            }
+            // console.log("Uploading FormData:");
+            // for (let pair of formData.entries()) {
+            //     console.log(pair[0], pair[1]);
+            // }
 
             // ✅ API request WITHOUT authentication
             const response = await axios.post("https://carzchoice.com/api/insertcarloanenquiry", formData, {
@@ -250,122 +251,122 @@ const CarLoan = () => {
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
-            {loading ? (
-                <ActivityIndicator size="large" color="#a62325" style={{ marginTop: 400 }} />
-            ) : (
-                <View style={{ flex: 1, paddingHorizontal: 20 }}>
-                    <View className="flex flex-row items-center justify-between my-5">
-                        <Text className="text-xl font-rubik-bold upper">Get Car Loan</Text>
 
-                        <TouchableOpacity onPress={() => router.back()} className="flex-row bg-gray-300 rounded-full w-11 h-11 items-center justify-center">
-                            <Image source={icons.backArrow} className="w-5 h-5" />
-                        </TouchableOpacity>
-                    </View>
-                    <ScrollView showsVerticalScrollIndicator={false} >
-                        <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 9999 }}>
-                            <Toast config={toastConfig} position="bottom" />
-                        </View>
+            <View style={{ flex: 1, paddingHorizontal: 20 }}>
+                <View className="flex flex-row items-center justify-between my-5">
+                    <Text className="text-xl font-rubik-bold upper">Get Car Loan</Text>
+
+                    <TouchableOpacity onPress={() => router.back()} className="flex-row bg-gray-300 rounded-full w-11 h-11 items-center justify-center">
+                        <Image source={icons.backArrow} className="w-5 h-5" />
+                    </TouchableOpacity>
+                </View>
+                {loading ? (
+                    <ActivityIndicator size="large" color="#a62325" style={{ marginTop: 400 }} />
+                ) : (
+                    <>
+                        <ScrollView showsVerticalScrollIndicator={false} >
+                            <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 9999 }}>
+                                <Toast config={toastConfig} position="bottom" />
+                            </View>
 
 
-                        <Text className="text-2xl font-rubik-bold">Looking for a Car Loan?</Text>
-                        <Text className="text-base font-rubik-medium">Please provide your details so our insurance partner can reach out to you about your inquiry.</Text>
+                            <Text className="text-2xl font-rubik-bold">Looking for a Car Loan?</Text>
+                            <Text className="text-base font-rubik-medium">Please provide your details so our insurance partner can reach out to you about your inquiry.</Text>
 
-                        <View>
-                            <Text className="text-lg font-rubik-bold">Our Lending Partners</Text>
-                            <View className="flex flex-row flex-wrap justify-between mt-5 ">
-                                {[
-                                    { image: images.axisbank, name: "Axis Bank" },
-                                    { image: images.hdbbank, name: "HDB Financial Services" },
-                                    { image: images.icicibank, name: "ICICI Bank" },
-                                    { image: images.idfcbank, name: "IDFC First Bank" },
-                                    { image: images.tvscredit, name: "TVS Credit Finance" },
-                                    { image: images.yesbank, name: "Yes Bank" }
-                                ].map((bank, index) => (
-                                    <View key={index} className="w-1/2 px-2 mb-4">
-                                        <View className="bg-white shadow-lg rounded-lg p-3 flex items-center">
-                                            <Image source={bank.image} className="w-32 h-20" style={{ resizeMode: 'contain' }} />
-                                            <Text className="text-sm font-rubik-medium text-center">{bank.name}</Text>
+                            <View>
+                                <Text className="text-lg font-rubik-bold">Our Lending Partners</Text>
+                                <View className="flex flex-row flex-wrap justify-between mt-5 ">
+                                    {[
+                                        { image: images.axisbank, name: "Axis Bank" },
+                                        { image: images.hdbbank, name: "HDB Financial Services" },
+                                        { image: images.icicibank, name: "ICICI Bank" },
+                                        { image: images.idfcbank, name: "IDFC First Bank" },
+                                        { image: images.tvscredit, name: "TVS Credit Finance" },
+                                        { image: images.yesbank, name: "Yes Bank" }
+                                    ].map((bank, index) => (
+                                        <View key={index} className="w-1/2 px-2 mb-4">
+                                            <View className="bg-white shadow-lg rounded-lg p-3 flex items-center">
+                                                <Image source={bank.image} className="w-32 h-20" style={{ resizeMode: 'contain' }} />
+                                                <Text className="text-sm font-rubik-medium text-center">{bank.name}</Text>
+                                            </View>
+                                        </View>
+                                    ))}
+                                </View>
+                            </View>
+
+                            <View className="flex mt-5 shadow rounded-lg bg-white p-5">
+
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                    <View style={{ flex: 1, marginRight: 10 }}>
+                                        {/* Car Brand Name */}
+                                        <Text style={[styles.label, errors.selectedBrand && { color: 'red' }]}>Car Brand Name</Text>
+                                        <View style={styles.pickerContainer}>
+                                            <RNPickerSelect
+                                                onValueChange={(value) => setSelectedBrand(value)}
+                                                value={selectedBrand}  // ✅ Ensure selected value is shown
+                                                items={brandData || []}
+                                                style={pickerSelectStyles}
+                                                placeholder={{ label: 'Choose an option...', value: null }}
+                                            />
                                         </View>
                                     </View>
-                                ))}
-                            </View>
 
-
-
-                        </View>
-
-                        <View className="flex mt-5 shadow rounded-lg bg-white p-5">
-
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                <View style={{ flex: 1, marginRight: 10 }}>
-                                    {/* Car Brand Name */}
-                                    <Text style={[styles.label, errors.selectedBrand && { color: 'red' }]}>Car Brand Name</Text>
-                                    <View style={styles.pickerContainer}>
-                                        <RNPickerSelect
-                                            onValueChange={(value) => setSelectedBrand(value)}
-                                            value={selectedBrand}  // ✅ Ensure selected value is shown
-                                            items={brandData || []}
-                                            style={pickerSelectStyles}
-                                            placeholder={{ label: 'Choose an option...', value: null }}
-                                        />
+                                    <View style={{ flex: 1 }}>
+                                        {/* Car Model */}
+                                        <Text style={[styles.label, errors.selectedModal && { color: 'red' }]}>Car Model</Text>
+                                        <View style={styles.pickerContainer}>
+                                            <RNPickerSelect
+                                                onValueChange={(value) => setSelectedModal(value)}
+                                                value={selectedModal}  // ✅ Ensure selected value is shown
+                                                items={modalData?.map((model, index) => ({
+                                                    label: model,
+                                                    value: model,
+                                                    key: index.toString(),
+                                                })) || []}
+                                                style={pickerSelectStyles}
+                                                placeholder={{ label: 'Choose an option...', value: null }}
+                                            />
+                                        </View>
                                     </View>
                                 </View>
 
-                                <View style={{ flex: 1 }}>
-                                    {/* Car Model */}
-                                    <Text style={[styles.label, errors.selectedModal && { color: 'red' }]}>Car Model</Text>
-                                    <View style={styles.pickerContainer}>
-                                        <RNPickerSelect
-                                            onValueChange={(value) => setSelectedModal(value)}
-                                            value={selectedModal}  // ✅ Ensure selected value is shown
-                                            items={modalData?.map((model, index) => ({
-                                                label: model,
-                                                value: model,
-                                                key: index.toString(),
-                                            })) || []}
-                                            style={pickerSelectStyles}
-                                            placeholder={{ label: 'Choose an option...', value: null }}
-                                        />
-                                    </View>
-                                </View>
-                            </View>
-
-                            {/* Car Variant */}
-                            <Text style={[styles.label, errors.selectedVariant && { color: 'red' }]}>Car Version</Text>
-                            <View style={styles.pickerContainer}>
-                                <RNPickerSelect
-                                    onValueChange={(value) => setSelectedVariant(value)}
-                                    value={selectedVariant}  // ✅ Ensure selected value is shown
-                                    items={variantData && Array.isArray(variantData) ? variantData : []}
-                                    style={pickerSelectStyles}
-                                    placeholder={{ label: 'Choose an option...', value: null }}
-                                />
-                            </View>
-
-                            {/* Select City */}
-                            <View style={{ flex: 1 }}>
-                                <Text style={[styles.label, errors.city && { color: 'red' }]}>Select District / City</Text>
+                                {/* Car Variant */}
+                                <Text style={[styles.label, errors.selectedVariant && { color: 'red' }]}>Car Version</Text>
                                 <View style={styles.pickerContainer}>
                                     <RNPickerSelect
-                                        onValueChange={(value) => setCity(value)}
-                                        value={city}  // ✅ Ensure selected value is shown
-                                        items={Array.isArray(cityData) ? cityData : []}
+                                        onValueChange={(value) => setSelectedVariant(value)}
+                                        value={selectedVariant}  // ✅ Ensure selected value is shown
+                                        items={variantData && Array.isArray(variantData) ? variantData : []}
                                         style={pickerSelectStyles}
                                         placeholder={{ label: 'Choose an option...', value: null }}
                                     />
                                 </View>
-                            </View>
 
-                        </View>
-                    </ScrollView>
-                    <TouchableOpacity onPress={handleSubmit} style={styles.submitButton} disabled={loading}>
-                        <Text style={styles.submitButtonText}>{loading ? 'Submitting...' : 'Get Loan Offer'}</Text>
-                    </TouchableOpacity>
-                    <Text className="text-xs text-center font-rubik-regular px-5 mb-5 italic">
-                        By proceeding ahead you agree to Carz Choice Visitor Agreement, Privacy Policy and Terms and Conditions.
-                    </Text>
-                </View>
-            )}
+                                {/* Select City */}
+                                <View style={{ flex: 1 }}>
+                                    <Text style={[styles.label, errors.city && { color: 'red' }]}>Select District / City</Text>
+                                    <View style={styles.pickerContainer}>
+                                        {/* // Default mode */}
+                                        <CitySelector
+                                            cityData={cityData}
+                                            onSelectCity={(value) => setCity(value)}
+                                        />
+                                    </View>
+                                </View>
+
+                            </View>
+                        </ScrollView>
+
+                        <TouchableOpacity onPress={handleSubmit} style={styles.submitButton} disabled={loading}>
+                            <Text style={styles.submitButtonText}>{loading ? 'Submitting...' : 'Get Loan Offer'}</Text>
+                        </TouchableOpacity>
+                        <Text className="text-xs text-center font-rubik-regular px-5 mb-5 italic">
+                            By proceeding ahead you agree to Carz Choice Visitor Agreement, Privacy Policy and Terms and Conditions.
+                        </Text>
+                    </>
+                )}
+            </View>
+
         </SafeAreaView>
     )
 }
@@ -381,7 +382,7 @@ const styles = StyleSheet.create({
     },
     input: {
         width: '100%',
-        height: 50,
+        height: 40,
         backgroundColor: '#edf5ff',
         borderRadius: 10,
         paddingHorizontal: 15,

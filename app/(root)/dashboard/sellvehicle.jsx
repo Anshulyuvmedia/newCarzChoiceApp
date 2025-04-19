@@ -281,7 +281,7 @@ const SellVehicle = () => {
                     text2: "Vehicle added successfully!",
                 });
                 setTimeout(() => {
-                    router.push('/myvehicles');
+                    router.push('/dashboard/myvehicles');
                 }, 1500);
             } else {
                 Toast.show({

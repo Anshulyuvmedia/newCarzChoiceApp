@@ -321,7 +321,7 @@ const RegisterDealer = () => {
             formData.append("id", id ?? "");
             formData.append("businessname", businessName);
             formData.append("emailaddress", email);
-            formData.append("dealertype", "Old Car Dealer");
+            formData.append("dealertype", "New Car Dealer");
             formData.append("mobilenumber", contactno);
             formData.append("whatsappnumber", whatsappNumber);
             formData.append("district", city);
@@ -465,7 +465,7 @@ const RegisterDealer = () => {
                             <View style={{ flex: 1 }}>
                                 <Text style={[styles.label, errors.city && { color: 'red' }]}>Select District / City</Text>
                                 <View style={styles.pickerContainer}>
-                                    <View className="flex flex-row items-center w-full bg-blue-50 rounded-lg px-3 py-2">
+                                    <View className="flex flex-row items-center w-full bg-blue-50 rounded-lg px-3 py-4">
                                         <Image source={icons.location} className="size-6" />
                                         <TextInput
                                             ref={inputRef}

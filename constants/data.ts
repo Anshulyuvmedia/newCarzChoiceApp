@@ -88,16 +88,10 @@ export const settings = [
     onPress: '/dashboard/carinsurance',
   },
   {
-    title: "My Vehicles",
-    subtitle: "All my vehicles list",
+    title: "Find Dealers",
+    subtitle: "All dealers list",
     icon: icons.showroom,
-    onPress: '/myvehicles',
-  },
-  {
-    title: "Sell Your Car",
-    subtitle: "Sell Your Car With Ease",
-    icon: icons.sell,
-    onPress: '/sellvehicle',
+    onPress: '/dealers',
   },
 
 ];

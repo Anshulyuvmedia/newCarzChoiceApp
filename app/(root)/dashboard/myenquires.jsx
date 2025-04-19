@@ -22,7 +22,7 @@ const MyEnquires = () => {
 
             // Fetch user cars from API
             const response = await axios.get(`https://carzchoice.com/api/getmyenquires/${parsedUserData.id}`);
-            console.log('API Response:', response.data.data); // Log the API response
+            // console.log('API Response:', response.data.data); // Log the API response
             if (response.data && response.data.data) {
                 const formattedData = response.data.data.map((item) => {
 

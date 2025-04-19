@@ -146,11 +146,9 @@ const Index = () => {
                 <GetLocation />
 
                 <View className='flex flex-row items-center justify-between'>
-                    <TouchableOpacity onPress={() => router.push('/sellvehicle')}>
-                        <Text className="font-rubik-bold text-lg">Sell</Text>
-                    </TouchableOpacity>
+                    
                     <TouchableOpacity onPress={() => router.push('explore')}>
-                        <Text className="ms-4 font-rubik-bold text-lg">Buy</Text>
+                        <Text className="ms-4 font-rubik-bold text-lg">Buy Car</Text>
                     </TouchableOpacity>
                 </View>
             </View>

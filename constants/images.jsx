@@ -14,10 +14,12 @@ import hdbbank from "@/assets/images/loans/hdb-bank-02.png";
 import axisbank from "@/assets/images/loans/axis-bank-logo-2x.png";
 import yesbank from "@/assets/images/loans/yes-bank-v2.png";
 import idfcbank from "@/assets/images/loans/idfc-first-updated.png";
+import dealerbanner from "@/assets/images/nc-dealer-wap.webp";
 
 export default {
   onboarding,
   avatar,
+  dealerbanner,
   newYork,
   japan,
   cardGradient,

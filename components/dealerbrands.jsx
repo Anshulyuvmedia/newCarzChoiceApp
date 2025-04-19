@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import axios from 'axios';
 import icons from "@/constants/icons";
 
-const AllBrands = () => {
+const Dealerbrands = () => {
     const params = useLocalSearchParams();
     const router = useRouter();
 
@@ -97,16 +97,7 @@ const AllBrands = () => {
 
     return (
         <View className="flex-1 bg-white px-5 pt-4">
-            {/* Header */}
-            <View className="flex-row items-center justify-between mb-4">
-                <Text className="text-xl font-rubik-bold text-black">All Brands</Text>
-                <TouchableOpacity
-                    onPress={() => router.back()}
-                    className="w-10 h-10 rounded-full bg-gray-200 items-center justify-center"
-                >
-                    <Image source={icons.backArrow} className="w-4 h-4" />
-                </TouchableOpacity>
-            </View>
+
 
             {/* Search Bar */}
             <View className="flex-row items-center bg-gray-100 border border-gray-300 rounded-lg px-3 py-2">
@@ -114,7 +105,7 @@ const AllBrands = () => {
                 <TextInput
                     value={searchQuery}
                     onChangeText={(text) => setSearchQuery(text)}
-                    placeholder="Search brand..."
+                    placeholder="Search Dealer Brand..."
                     placeholderTextColor="#888"
                     className="flex-1 text-base text-black"
                 />
@@ -139,7 +130,7 @@ const AllBrands = () => {
     );
 };
 
-export default AllBrands;
+export default Dealerbrands;
 
 const styles = StyleSheet.create({
     brandImg: {
