@@ -85,7 +85,7 @@ const Dealers = () => {
                             {/* Brand Filters */}
                             <View className="px-5 mb-4">
                                 <Text className="text-black text-base font-rubik-bold text-center mt-2">
-                                    Connect to the Right car Dealer
+                                    Connect to the Right Car Dealer
                                 </Text>
                                 <Dealerbrands />
                             </View>

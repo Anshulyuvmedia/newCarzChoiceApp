@@ -21,7 +21,7 @@ const ExploreDealers = () => {
     });
     const insets = useSafeAreaInsets();
 
-    const handleCardPress = (id) => router.push(`/vehicles/${id}`);
+    const handleCardPress = (id) => router.push(`/dealers/${id}`);
 
     const loadMoreCars = () => {
         if (loadingMore || visibleCount >= listingData.length) return;
@@ -40,7 +40,7 @@ const ExploreDealers = () => {
             const response = await axios.get("https://carzchoice.com/api/filternewcardealers", {
                 params: {
                     brandname: params.brand || undefined,
-                    cityname: params.city || undefined,
+                    cityname: params.city || currentCity,
                 },
             });
 
@@ -80,7 +80,7 @@ const ExploreDealers = () => {
                         <Image source={icons.backArrow} className="size-5" />
                     </TouchableOpacity>
                     <Text className="text-base mr-2 text-center font-rubik-medium text-black-300">
-                        Search for Your Dream Car
+                        Search for Car Dealers
                     </Text>
                     <TouchableOpacity onPress={() => router.push('/notifications')}>
                         <Image source={icons.bell} className="size-6" />
@@ -122,7 +122,7 @@ const ExploreDealers = () => {
                                     <Text className="text-base font-rubik-bold text-black-300 mb-1">
                                         {item.businessname}
                                     </Text>
-                                    <Text className="text-xs text-gray-500 mb-1">
+                                    <Text className="text-sm text-gray-500 mb-1 font-rubik-medium">
                                         {item.district}, {item.state}
                                     </Text>
 
@@ -130,7 +130,7 @@ const ExploreDealers = () => {
                                         {item.brands?.map((brand, index) => (
                                             <Text
                                                 key={index}
-                                                className="text-xs bg-gray-200 text-gray-700 rounded-full px-2 py-1"
+                                                className="text-xs bg-gray-200 text-primary-300 rounded-full px-2 py-1 font-rubik-medium"
                                             >
                                                 {brand}
                                             </Text>
@@ -141,15 +141,15 @@ const ExploreDealers = () => {
                                 <View className="flex-row mt-2 space-x-3">
                                     <TouchableOpacity
                                         onPress={() => handleCardPress(item.id)}
-                                        className="bg-primary-300 px-4 py-1 rounded-full"
+                                        className="bg-primary-300 px-4 py-1 rounded-full me-2"
                                     >
-                                        <Text className="text-white text-xs font-semibold">View</Text>
+                                        <Text className="text-white text-base font-semibold ">View Details</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity
                                         onPress={() => {/* insert call logic here */ }}
                                         className="bg-green-500 px-4 py-1 rounded-full"
                                     >
-                                        <Text className="text-white text-xs font-semibold">Call Now</Text>
+                                        <Text className="text-white text-base font-semibold">Call Now</Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>

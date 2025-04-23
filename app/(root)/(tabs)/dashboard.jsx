@@ -196,7 +196,7 @@ const Dashboard = () => {
                 </View>
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => router.push('/dashboard/exploredealers')} className="flex flex-row items-center py-2 border border-gray-300 mb-2 rounded-2xl ps-4 bg-white">
+              <TouchableOpacity onPress={() => router.push('/dealers/exploredealers')} className="flex flex-row items-center py-2 border border-gray-300 mb-2 rounded-2xl ps-4 bg-white">
                 <Image source={icons.customersupport} className="size-8 backgroundColor: blue" />
                 <View>
                   <Text className="text-lg font-rubik-medium text-black-300 ml-3">Explore Dealers</Text>

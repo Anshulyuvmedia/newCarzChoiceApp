@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput, FlatList, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput, FlatList, Dimensions, ActivityIndicator } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import axios from 'axios';
@@ -31,7 +31,7 @@ const Dealerbrands = () => {
             setSelectedCategory(category);
         }
 
-        router.push({ pathname: "explore", params: updatedParams });
+        router.push({ pathname: "/../dealers/exploredealers", params: updatedParams });
     };
 
     const fetchBrandList = async () => {
@@ -97,8 +97,6 @@ const Dealerbrands = () => {
 
     return (
         <View className="flex-1 bg-white px-5 pt-4">
-
-
             {/* Search Bar */}
             <View className="flex-row items-center bg-gray-100 border border-gray-300 rounded-lg px-3 py-2">
                 <Image source={icons.search} className="w-5 h-5 mr-2" />
@@ -117,15 +115,20 @@ const Dealerbrands = () => {
             </View>
 
             {/* Brand Grid */}
-            <FlatList
-                data={filteredBrands}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id.toString()}
-                numColumns={ITEMS_PER_ROW}
-                columnWrapperStyle={{ justifyContent: 'center', marginTop: 12 }}
-                contentContainerStyle={{ paddingBottom: 100 }}
-                keyboardShouldPersistTaps="handled"
-            />
+            {loading ? (
+                <ActivityIndicator size="large" color="#a62325" style={{ marginTop: 100 }} />
+            ) : (
+                <FlatList
+                    data={filteredBrands}
+                    renderItem={renderItem}
+                    keyExtractor={(item) => item.id.toString()}
+                    numColumns={ITEMS_PER_ROW}
+                    columnWrapperStyle={{ justifyContent: 'center', marginTop: 12 }}
+                    contentContainerStyle={{ paddingBottom: 100 }}
+                    keyboardShouldPersistTaps="handled"
+                />
+            )}
+
         </View>
     );
 };
