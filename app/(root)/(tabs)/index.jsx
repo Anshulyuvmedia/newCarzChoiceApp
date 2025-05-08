@@ -3,7 +3,7 @@ import React, { useEffect, useState, useContext, useCallback } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import images from '@/constants/images';
 import Search from '@/components/Search';
-import { Card, LocationCard } from '@/components/Cards';
+import { Card, LocationCard, FeaturedCard, PopularCard } from '@/components/Cards';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -25,6 +25,13 @@ const Index = () => {
 
     const [visibleListingCount, setVisibleListingCount] = useState(6);
     const [visibleLocationCount, setVisibleLocationCount] = useState(6);
+
+    const [trendingCars, setTrendingCars] = useState([]);
+    const [popularCars, setPopularCars] = useState([]);
+    const [upcomingCars, setUpcomingCars] = useState([]);
+    const [offerCars, setOfferCars] = useState([]);
+    const [topCarsIndia, setTopCarsIndia] = useState([]);
+
 
     // Memoized handleCardPress
     const handleCardPress = useCallback((id) => {
@@ -76,22 +83,42 @@ const Index = () => {
     const fetchListingData = async () => {
         setListingLoading(true);
         try {
-            const response = await axios.get(`https://carzchoice.com/api/oldvehiclelist`);
-            // console.log("Listing API Response:", response.data);
+            const response = await axios.get(`https://carzchoice.com/api/featuredCars`);
+            const resData = response.data.data;
+            // console.log("Listing API Response:", resData);
 
-            if (Array.isArray(response.data)) {
-                setListingData(response.data);
+            if (resData && typeof resData === 'object') {
+                setTrendingCars(Object.values(resData.matches || {}));
+                setPopularCars(Object.values(resData.matchespopular || {}));
+                setUpcomingCars(Object.values(resData.matchesupcoming || {}));
+                setOfferCars(Object.values(resData.matchesoffer || {}));
+                setTopCarsIndia(Object.values(resData.matchestopcarsindia || {}));
+
+                // console.log("Trending Cars:", Object.values(resData.matches || {}));
+                // console.log("Popular Cars:", Object.values(resData.matchespopular || {}));
+                // console.log("Upcoming Cars:", Object.values(resData.matchesupcoming || {}));
+                // console.log("Offer Cars:", Object.values(resData.matchesoffer || {}));
+                // console.log("Top Cars India:", Object.values(resData.matchestopcarsindia || {}));
             } else {
                 console.error('Unexpected API response format:', response.data);
-                setListingData([]); // Set empty array on unexpected format
+                setTrendingCars([]);
+                setPopularCars([]);
+                setUpcomingCars([]);
+                setOfferCars([]);
+                setTopCarsIndia([]);
             }
         } catch (error) {
             console.error('Error fetching listings:', error);
-            setListingData([]); // Handle failed API call gracefully
+            setTrendingCars([]);
+            setPopularCars([]);
+            setUpcomingCars([]);
+            setOfferCars([]);
+            setTopCarsIndia([]);
         } finally {
             setListingLoading(false);
         }
     };
+
 
     const fetchFilterData = async () => {
         setFilterLoading(true);
@@ -145,19 +172,19 @@ const Index = () => {
 
                 <GetLocation />
 
-                <View className='flex flex-row items-center justify-between'>
+                {/* <View className='flex flex-row items-center justify-between'>
                     
                     <TouchableOpacity onPress={() => router.push('explore')}>
-                        <Text className="ms-4 font-rubik-bold text-lg">Buy Car</Text>
+                        <Text className="ms-4 font-rubik-bold text-lg">Buy</Text>
                     </TouchableOpacity>
-                </View>
+                </View> */}
             </View>
 
             {userLoading || listingLoading || filterLoading ? (
                 <ActivityIndicator size="large" color="#a62325" style={{ marginTop: 300 }} />
             ) : (
                 <FlatList
-                    data={listingData?.slice(0, visibleListingCount) || []}
+                    data={topCarsIndia?.slice(0, visibleListingCount) || []}
                     renderItem={({ item }) => <Card item={item} onPress={() => handleCardPress(item.id)} />}
                     keyExtractor={(item, index) => item.id?.toString() || index.toString()}
                     numColumns={2}
@@ -165,7 +192,7 @@ const Index = () => {
                     columnWrapperClassName='flex gap-2 px-3'
                     showsVerticalScrollIndicator={false}
                     onEndReached={() => {
-                        if (listingData?.length > visibleListingCount) {
+                        if (topCarsIndia?.length > visibleListingCount) {
                             setVisibleListingCount((prev) => prev + 6);
                         }
                     }}
@@ -207,18 +234,96 @@ const Index = () => {
                                 )}
                             </View>
 
+                            {trendingCars?.length > 0 && (
+                                <View className='mt-5'>
+                                    <Text className='text-xl font-rubik-bold text-black-300 capitalize mb-3'>Featured Cars</Text>
+                                    <FlatList
+                                        data={trendingCars.slice(0, visibleLocationCount)}
+                                        renderItem={({ item }) => (
+                                            <FeaturedCard item={item} onPress={() => handleCardPress(item.id)} />
+                                        )}
+                                        keyExtractor={(item, index) => item.id.toString() || index.toString()}
+                                        horizontal
+                                        showsHorizontalScrollIndicator={false}
+                                        contentContainerStyle={{
+                                            paddingHorizontal: 0,
+                                            gap: 16,
+                                            paddingBottom: 24,
+                                        }}
+                                        onEndReached={() => {
+                                            if (trendingCars.length > visibleLocationCount) {
+                                                setVisibleLocationCount((prev) => prev + 6);
+                                            }
+                                        }}
+                                        onEndReachedThreshold={0.5}
+                                    />
+                                </View>
+                            )}
+
                             <View className='mt-5'>
                                 <Text className='text-xl font-rubik-bold text-black-300 capitalize'>Get Car By Brand</Text>
                                 <BrandList />
                             </View>
+
+                            {popularCars?.length > 0 && (
+                                <View className='mt-5'>
+                                    <Text className='text-xl font-rubik-bold text-black-300 capitalize mb-3'>Popular Cars</Text>
+                                    <FlatList
+                                        data={popularCars.slice(0, visibleLocationCount)}
+                                        renderItem={({ item }) => (
+                                            <PopularCard item={item} onPress={() => handleCardPress(item.id)} />
+                                        )}
+                                        keyExtractor={(item, index) => item.id.toString() || index.toString()}
+                                        horizontal
+                                        showsHorizontalScrollIndicator={false}
+                                        contentContainerStyle={{
+                                            paddingHorizontal: 0,
+                                            gap: 16,
+                                            paddingBottom: 24,
+                                        }}
+                                        onEndReached={() => {
+                                            if (popularCars.length > visibleLocationCount) {
+                                                setVisibleLocationCount((prev) => prev + 6);
+                                            }
+                                        }}
+                                        onEndReachedThreshold={0.5}
+                                    />
+                                </View>
+                            )}
 
                             <View className='mt-5'>
                                 <Text className='text-xl font-rubik-bold text-black-300 mb-3'>Old Car By Cities</Text>
                                 <LocationList />
                             </View>
 
-                            <View className='mt-5'>
-                                <Text className='text-xl font-rubik-bold text-black-300'>Other Cars</Text>
+                            {upcomingCars?.length > 0 && (
+                                <View className='mt-5'>
+                                    <Text className='text-xl font-rubik-bold text-black-300 capitalize mb-3'>Upcoming Cars</Text>
+                                    <FlatList
+                                        data={upcomingCars.slice(0, visibleLocationCount)}
+                                        renderItem={({ item }) => (
+                                            <FeaturedCard item={item} onPress={() => handleCardPress(item.id)} />
+                                        )}
+                                        keyExtractor={(item, index) => item.id.toString() || index.toString()}
+                                        horizontal
+                                        showsHorizontalScrollIndicator={false}
+                                        contentContainerStyle={{
+                                            paddingHorizontal: 0,
+                                            gap: 16,
+                                            paddingBottom: 24,
+                                        }}
+                                        onEndReached={() => {
+                                            if (upcomingCars.length > visibleLocationCount) {
+                                                setVisibleLocationCount((prev) => prev + 6);
+                                            }
+                                        }}
+                                        onEndReachedThreshold={0.5}
+                                    />
+                                </View>
+                            )}
+
+                            <View className='mt-4'>
+                                <Text className='text-xl font-rubik-bold text-black-300'>Top Car in India</Text>
                             </View>
                         </View>
                     }

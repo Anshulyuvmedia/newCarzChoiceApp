@@ -1,6 +1,6 @@
 
-import { StyleSheet, Image, FlatList, ScrollView, Alert, Text, TouchableOpacity, View, Dimensions, Platform, ActivityIndicator, Share } from "react-native";
-import { router, useLocalSearchParams } from "expo-router";
+import { StyleSheet, Image, FlatList, Text, TouchableOpacity, View, Dimensions, Platform, ActivityIndicator, Share } from "react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import icons from "@/constants/icons";
 import images from "@/constants/images";
 import React, { useEffect, useState, useRef } from 'react';
@@ -9,7 +9,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import 'react-native-get-random-values';
 import { useNavigation } from "@react-navigation/native";
 import MortgageCalculator from "@/components/MortgageCalculator";
-import * as Linking from 'expo-linking';
 import Carousel from "react-native-reanimated-carousel";
 import { AntDesign } from "@expo/vector-icons";
 import FeaturesAccordion from "../../../components/FeaturesAccordion";
@@ -17,8 +16,9 @@ import SpecsAccordion from "../../../components/SpecsAccordion";
 import Toast, { BaseToast } from 'react-native-toast-message';
 import moment from 'moment';
 import RBSheet from "react-native-raw-bottom-sheet";
-
+// import { useChatContext } from '../chat/ChatContext';
 const { width } = Dimensions.get("window");
+
 const CarDetails = () => {
     const CarId = useLocalSearchParams().id;
     const refRBSheet = useRef();
@@ -26,9 +26,11 @@ const CarDetails = () => {
     const [error, setError] = useState(null);
     const [CarData, setCarData] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [CarThumbnail, setCarThumbnail] = useState(images.avatar);
     const [CarGallery, setCarGallery] = useState([]);
+    const [dealerThumbnail, setDealerThumbnail] = useState(images.avatar);
+    const [dealerData, setDealerData] = useState([]);
 
+    const [userData, setUserData] = useState([]);
     const [loggedinUserId, setLoggedinUserId] = useState([]);
     const carouselRef = useRef(null);
     const navigation = useNavigation();
@@ -62,46 +64,27 @@ const CarDetails = () => {
             />
         ),
     };
-    const openWhatsApp = (phoneNumber) => {
-        let url = "";
-
-        if (Platform.OS === "android") {
-            url = `whatsapp://send?phone=${phoneNumber}`;
-        } else {
-            url = `https://wa.me/${phoneNumber}`; // iOS uses wa.me
-        }
-
-        Linking.canOpenURL(url)
-            .then((supported) => {
-                if (supported) {
-                    Linking.openURL(url);
-                } else {
-                    Alert.alert("WhatsApp is not installed");
-                }
-            })
-            .catch((err) => console.error("An error occurred", err));
+    const router = useRouter();
+    const handleEditPress = () => {
+        router.push(`/dashboard/editvehicle/${CarId}`);
     };
 
     const handleEnquiry = async () => {
         try {
-            setLoading(true); // Show loading indicator
+            setLoading(true);
             const storedData = await AsyncStorage.getItem('userData');
-
             if (!storedData) {
-                Toast.show({
-                    type: 'error',
-                    text1: 'Error',
-                    text2: 'User data not found.',
-                });
-                setLoading(false);
+                Toast.show({ type: 'error', text1: 'Error', text2: 'User data not found.' });
                 return;
             }
-
             const parsedUserData = JSON.parse(storedData);
+            const carImage = CarGallery?.length > 0 ? CarGallery[0] : null;
 
             const enquiryData = {
                 fullname: parsedUserData.fullname || "Unknown",
                 userid: parsedUserData.id,
+                dealerid: dealerData.userid,
+                dealername: dealerData.businessname,
                 carid: CarId,
                 mobile: parsedUserData.contactno,
                 email: parsedUserData.email,
@@ -112,35 +95,9 @@ const CarDetails = () => {
                 remarks: `Interested in ${CarData.manufactureyear} ${CarData.brandname} ${CarData.carname} ${CarData.modalname}`,
             };
 
-            // console.log("Sending Enquiry Data:", enquiryData);
-
-            const response = await axios.post("https://carzchoice.com/api/bookvehiclenow", enquiryData, {
-                headers: { "Content-Type": "application/json" }
-            });
-
-            // console.log("Full API Response:", response.data);
-
-            // Fix success check
-            if (response.data.success === true) {
-                Toast.show({
-                    type: 'success',
-                    text1: 'Success',
-                    text2: 'Enquiry submitted successfully!',
-                });
-            } else {
-                Toast.show({
-                    type: 'error',
-                    text1: 'Submission Failed',
-                    text2: response.data.message || "Unknown error",
-                });
-            }
         } catch (error) {
-            console.error("Error submitting enquiry:", error);
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: 'An error occurred. Please try again.',
-            });
+            console.error("Error submitting enquiry or starting chat:", error);
+            Toast.show({ type: 'error', text1: 'Error', text2: 'An error occurred. Please try again.' });
         } finally {
             setLoading(false);
         }
@@ -167,16 +124,20 @@ const CarDetails = () => {
         }
     };
 
+    const handleChatPress = async => {
+        router.push({
+            pathname: "/chat",
+        });
+    }
+
     const fetchCarData = async () => {
         setLoading(true);
         setError(null); // Reset error state before fetching
 
         try {
-            // console.log("Fetching car data...",CarId);
-            const response = await axios.get(`https://carzchoice.com/api/oldcarlistingdetails/${CarId}`);
+            const response = await axios.get(`https://carzchoice.com/api/carlistingdetails/${CarId}`);
 
-            // console.log("API Response:", response.data);
-
+            // console.log("API Response:", response.data.data.cardetails);
             if (response.data?.data?.cardetails) {
                 let apiData = response.data.data.cardetails;
                 let parsedSpecifications = [];
@@ -225,27 +186,47 @@ const CarDetails = () => {
 
                 // ✅ Handle Gallery Images
                 try {
-                    let imageBaseURL = "https://carzchoice.com/";
-                    let fallbackImage = "https://carzchoice.com/assets/backend-assets/images/1721106135_9.png";
-
+                    let imageBaseURL = "https://carzchoice.com/assets/backend-assets/images/";
                     let imagesArray = [];
+
+                    // console.log("📦 Raw apiData.images:", apiData.images);
+                    // Check if apiData.images exists
                     if (typeof apiData.images === "string") {
-                        imagesArray = JSON.parse(apiData.images);
+                        try {
+                            imagesArray = JSON.parse(apiData.images);
+                        } catch (jsonError) {
+                            console.error("❌ JSON parse error:", jsonError);
+                        }
+                    } else if (Array.isArray(apiData.images)) {
+                        imagesArray = apiData.images;
                     }
 
-                    formattedImages = imagesArray.map(image =>
-                        `${imageBaseURL}${image.imageurl.replace(/\\/g, "/")}`
-                    );
+                    // Ensure formattedImages only includes valid URLs
+
+                    // console.log("🧪 Parsed imagesArray:", imagesArray);
+
+
+                    const formattedImages = imagesArray
+                        .filter(image => typeof image === 'string' && image.trim() !== '')
+                        .map(image => `${imageBaseURL}${image.replace(/\\/g, "/")}`);
+
+                    // console.log("✅ Formatted Images:", formattedImages);
+                    setCarGallery(formattedImages);
 
                 } catch (error) {
-                    console.error("❌ Error parsing images:", error);
+                    console.error("❌ Error formatting images:", error);
                 }
 
                 // ✅ Update state
                 setCarData(apiData);
                 setSpecifications(parsedSpecifications);
                 setFeatures(parsedFeatures);
-                setCarGallery(formattedImages);
+                // setCarGallery(formattedImages);
+                // console.log("Car CarData:", apiData.userid);
+                // ✅ Call fetchDealerData with proper dealer/user id
+                if (apiData.userid) {
+                    fetchDealerData(apiData.userid);
+                }
 
             } else {
                 throw new Error("Car details not found in response.");
@@ -274,23 +255,67 @@ const CarDetails = () => {
         }
     };
 
+    const fetchDealerData = async (dealerid) => {
+        setLoading(true);
+        try {
+            // console.log("Fetching dealer data...", dealerid);
+            const response = await axios.get(`https://carzchoice.com/api/dealerprofile/${dealerid}`);
+
+            const apiDealerData = response.data?.dealerData?.[0];
+            // console.log('Dealer Data:', apiDealerData);
+
+            if (apiDealerData) {
+                setDealerData(apiDealerData);
+
+                // Set Profile Image, ensuring fallback to default avatar
+                setDealerThumbnail(
+                    apiDealerData.businesspics
+                        ? apiDealerData.businesspics.startsWith('http')
+                            ? apiDealerData.businesspics
+                            : `https://carzchoice.com/${apiDealerData.businesspics}`
+                        : images.avatar
+                );
+            }
+        } catch (error) {
+            console.error('Error fetching user data:', error);
+            setDealerThumbnail(images.avatar);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const storedData = await AsyncStorage.getItem('userData');
+                if (storedData) {
+                    const parsedData = JSON.parse(storedData);
+                    setUserData(parsedData);
+                    setLoggedinUserId(parsedData.id);
+                    // console.log("Logged in User ID:", parsedData.id);
+                }
+            } catch (error) {
+                console.error("❌ Error fetching user data:", error);
+            }
+        };
+        fetchUserData();
+    }, []);
 
     useEffect(() => {
         let isMounted = true;
-        if (CarId) {
+
+        if (CarId && loggedinUserId !== null) {
             fetchCarData().then(() => {
                 if (isMounted) setLoading(false);
             });
         }
-        return () => { isMounted = false; };  // Cleanup on unmount
-    }, [CarId]);
 
-
-
+        return () => { isMounted = false; };
+    }, [CarId, loggedinUserId]); // 👈 Trigger after user ID is set
 
     // ✅ Loading State
     if (loading) {
-        return <ActivityIndicator size="large" color="#a62325" style={{ marginTop: 400 }} />;
+        return <ActivityIndicator size="large" color="#0061ff" style={{ marginTop: 400 }} />;
     }
 
     // ✅ Error State
@@ -418,7 +443,7 @@ const CarDetails = () => {
         <View className="pb-24">
             <FlatList
                 data={[
-                    <Toast config={toastConfig} position="top" />,
+                    <Toast config={toastConfig} position="bottom" />,
                     <Text className='text-xl font-rubik-bold'>{CarData.manufactureyear} {CarData.brandname} {CarData.carname} {CarData.modalname}</Text>,
                     <View className='flex flex-row items-center gap-3'>
                         <View className='flex flex-row items-center px-4 py-2 bg-primary-100 rounded-full'>
@@ -452,6 +477,21 @@ const CarDetails = () => {
                             </View>
                         )}
                     />,
+
+                    <View className="flex-row border-top-1" >
+                        <Text className="text-black-300 text-base font-rubik-medium mb-1 me-3">Price</Text>
+                        <Text
+                            numberOfLines={1}
+                            className="text-primary-300 text-base font-rubik-bold"
+                        >
+                            {new Intl.NumberFormat('en-IN', {
+                                style: 'currency',
+                                currency: 'INR',
+                                maximumFractionDigits: 0,
+                            }).format(CarData.price)}
+                        </Text>
+                    </View>,
+
 
                     carDetails && (
                         <View className="bg-white drop-shadow-sm px-5 py-3 rounded-lg mb-5">
@@ -498,7 +538,7 @@ const CarDetails = () => {
                         onPress={() => refRBSheet.current.open()}
                         style={{
                             backgroundColor: "white",
-                            borderColor: "#a62325",
+                            borderColor: "#0061FF",
                             borderWidth: 2,
                             paddingHorizontal: 20,
                             paddingVertical: 12,
@@ -506,8 +546,48 @@ const CarDetails = () => {
                             marginBottom: 20,
                         }}
                     >
-                        <Text style={{ color: "#a62325", fontSize: 16, textAlign: 'center', fontWeight: 600 }}>🧮 Calculate Your EMI</Text>
+                        <Text style={{ color: "#0061FF", fontSize: 16, textAlign: 'center', fontWeight: 600 }}>🧮 Calculate Your EMI</Text>
                     </TouchableOpacity>,
+
+                    <View className="mt-6">
+                        <Text className="font-rubik-bold text-lg mb-3 text-gray-800">Dealer Near By:</Text>
+
+                        {dealerData && (
+                            <View className="bg-white rounded-2xl p-4 shadow-md flex-row items-center space-x-4">
+                                {/* Dealer Thumbnail */}
+                                <Image
+                                    source={typeof dealerThumbnail === 'string' ? { uri: dealerThumbnail } : dealerThumbnail}
+                                    className="w-24 h-24 rounded-xl"
+                                    resizeMode="cover"
+                                />
+
+                                {/* Dealer Details */}
+                                <View className="flex-1 ms-2">
+                                    <Text className="text-xl font-rubik-bold text-primary-500 capitalize mb-1">
+                                        {dealerData?.businessname || 'User'}
+                                    </Text>
+
+                                    {/* <Text className="text-gray-700 mb-1">
+                                        <Text className="font-medium">Email:</Text> {dealerData.email || 'N/A'}
+                                    </Text> */}
+
+                                    <View className="flex-row items-center mb-2">
+                                        <Image source={icons.location} className="w-4 h-4 mr-1" />
+                                        <Text className="text-gray-700">
+                                            {dealerData.district || 'N/A'}, {dealerData.state || 'N/A'}
+                                        </Text>
+                                    </View>
+
+                                    <TouchableOpacity
+                                        onPress={() => router.push('/dealers/' + dealerData.userid)}
+                                        className="mt-2 bg-primary-100 px-4 py-2 rounded-full w-max"
+                                    >
+                                        <Text className="text-primary-600 font-rubik-medium text-sm text-center">View Profile</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        )}
+                    </View>,
 
                     <RBSheet
                         ref={refRBSheet}
@@ -533,21 +613,41 @@ const CarDetails = () => {
                 ListHeaderComponent={renderHeader}
             />
 
-            <View className="absolute bg-white bottom-0 w-full rounded-t-2xl border-t border-r border-l border-primary-200 p-7">
-                <View className="flex flex-row items-center justify-between gap-10">
-                    <View className="flex flex-col items-start">
-                        <Text className="text-black-200 text-xs font-rubik-medium">Price</Text>
-                        <Text numberOfLines={1} className="text-primary-300 text-start text-2xl font-rubik-bold">
-                            {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(CarData.price)}
-                        </Text>
-                    </View>
+            <View className="absolute bottom-0 w-full bg-white rounded-t-2xl border border-primary-200 p-5 shadow-xl">
+                {/* Action Buttons */}
+                <View className="flex flex-row justify-between gap-4">
+                    {loggedinUserId == CarData?.userid ? (
+                        <>
+                            <TouchableOpacity
+                                onPress={handleEditPress}
+                                className="flex-1 flex-row items-center justify-center bg-green-600 py-3 rounded-full shadow-sm"
+                            >
+                                <Image source={icons.bestprice} className="w-5 h-5 mr-2" />
+                                <Text className="text-white text-lg font-rubik-bold">Edit Vehicle</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={handleChatPress}
+                                className="flex-1 flex-row items-center justify-center bg-primary-300 py-3 rounded-full shadow-sm"
+                            >
+                                <Image source={icons.bubblechat} className="w-5 h-5 mr-2" />
+                                <Text className="text-white text-lg font-rubik-bold">View Chat</Text>
+                            </TouchableOpacity>
+                        </>
+                    ) : (
+                        <TouchableOpacity
+                            onPress={handleEnquiry}
+                            className="flex-1 flex-row items-center justify-center bg-primary-300 py-3 rounded-full shadow-sm"
+                        >
+                            <Image source={icons.bubblechat} className="w-5 h-5 mr-2" />
+                            <Text className="text-white text-lg font-rubik-bold">Chat Now</Text>
+                        </TouchableOpacity>
+                    )}
 
 
-                    <TouchableOpacity onPress={() => handleEnquiry()} className="flex-1 flex flex-row items-center justify-center bg-primary-300 py-3 rounded-full shadow-md shadow-zinc-400">
-                        <Text className="text-white text-lg text-center font-rubik-bold">Enquire Now</Text>
-                    </TouchableOpacity>
+
                 </View>
             </View>
+
         </View>
     )
 }

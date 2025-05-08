@@ -1,4 +1,4 @@
-import { View, Text, Image, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, Image, TouchableOpacity, FlatList, ActivityIndicator, Linking } from 'react-native';
 import { useState, useEffect, useContext } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
@@ -107,7 +107,7 @@ const ExploreDealers = () => {
                     data={visibleCars}
                     renderItem={({ item }) => (
                         <TouchableOpacity
-                            onPress={() => handleCardPress(item.id)}
+                            onPress={() => handleCardPress(item.userid)}
                             className="bg-white border border-gray-200 rounded-2xl m-2 p-3 flex-row shadow-sm"
                             activeOpacity={0.9}
                         >
@@ -140,13 +140,17 @@ const ExploreDealers = () => {
 
                                 <View className="flex-row mt-2 space-x-3">
                                     <TouchableOpacity
-                                        onPress={() => handleCardPress(item.id)}
+                                        onPress={() => handleCardPress(item.userid)}
                                         className="bg-primary-300 px-4 py-1 rounded-full me-2"
                                     >
                                         <Text className="text-white text-base font-semibold ">View Details</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity
-                                        onPress={() => {/* insert call logic here */ }}
+                                        onPress={() => {
+                                            const phoneNumber = item.mobilenumber || '1234567890'; 
+                                            const url = `tel:${phoneNumber}`;
+                                            Linking.openURL(url).catch(err => console.error('Error opening dialer:', err));
+                                        }}
                                         className="bg-green-500 px-4 py-1 rounded-full"
                                     >
                                         <Text className="text-white text-base font-semibold">Call Now</Text>
