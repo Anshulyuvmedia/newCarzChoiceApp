@@ -26,13 +26,13 @@ const MortgageCalculator = ({ closeSheet, totalprice }) => {
 
     return (
         <View style={{ flex: 1 }}>
-            <View className="flex flex-row justify-between items-center mb-3">
+            <View className="flex flex-row justify-center items-center mb-3">
                 <Text style={styles.title}>EMI Calculator</Text>
-                <TouchableOpacity onPress={closeSheet}>
+                {/* <TouchableOpacity onPress={closeSheet}>
                     <Text className="text-lg font-rubik-bold text-red-500">
                         Close
                     </Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
             </View>
 
             <KeyboardAvoidingView
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         textAlign: "center",
         paddingVertical: 15,
-        backgroundColor: "#fff",
+        // backgroundColor: "#fff",
         marginStart: 15,
     },
     card: {

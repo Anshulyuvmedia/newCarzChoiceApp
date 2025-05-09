@@ -188,6 +188,13 @@ const Dashboard = () => {
                 </TouchableOpacity>
               )}
 
+              <TouchableOpacity onPress={() => router.push('/vehicles/tabview')} className="flex flex-row items-center py-2 border border-gray-300 mb-2 rounded-2xl ps-4 bg-white">
+                <Image source={icons.customersupport} className="size-8 backgroundColor: blue" />
+                <View>
+                  <Text className="text-lg font-rubik-medium text-black-300 ml-3">Tab View</Text>
+                  <Text className="text-sm font-rubik text-gray-700 ml-3">Help Center & Legal terms</Text>
+                </View>
+              </TouchableOpacity>
               <TouchableOpacity onPress={() => router.push('/dashboard/support')} className="flex flex-row items-center py-2 border border-gray-300 mb-2 rounded-2xl ps-4 bg-white">
                 <Image source={icons.customersupport} className="size-8 backgroundColor: blue" />
                 <View>

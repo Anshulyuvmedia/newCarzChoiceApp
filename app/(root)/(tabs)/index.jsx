@@ -204,7 +204,7 @@ const Index = () => {
                             <View className='mt-5'>
                                 <BannerSlider />
                             </View>
-                            <View className='mt-5'>
+                            {/* <View className='mt-5'>
                                 <Text className='text-xl font-rubik-bold text-black-300 capitalize'>Get Car in {currentCity}</Text>
                                 {locationData && locationData.length > 0 ? (
                                     <FlatList
@@ -232,7 +232,7 @@ const Index = () => {
                                         No cars in your location
                                     </Text>
                                 )}
-                            </View>
+                            </View> */}
 
                             {trendingCars?.length > 0 && (
                                 <View className='mt-5'>

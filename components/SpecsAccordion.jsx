@@ -96,7 +96,7 @@ const SpecsSheet = ({ specifications = [] }) => {
                 }}
             >
                 {selectedSpecs && (
-                    <View>
+                    <View className="flex-1">
                         {/* Selected Title Display */}
                         <Text style={styles.sheetTitle}>{selectedSpecs}</Text>
                         {renderScene()}

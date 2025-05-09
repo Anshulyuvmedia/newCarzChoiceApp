@@ -73,7 +73,7 @@ const FeaturesSheet = ({ features = [] }) => {
 
             <RBSheet
                 ref={refRBSheet}
-                height={450}
+                height={500}
                 openDuration={250}
                 customStyles={{
                     container: styles.sheetContainer,
@@ -84,7 +84,7 @@ const FeaturesSheet = ({ features = [] }) => {
                 }}
             >
                 {selectedSection && (
-                    <View>
+                    <View className="flex-1">
                         {/* ✅ Fixed: Display Selected Section Name */}
                         <Text style={styles.sheetTitle}>{selectedSection.name}</Text>
                         {renderScene()}
