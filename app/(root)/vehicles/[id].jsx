@@ -14,6 +14,7 @@ import SpecsAccordion from "../../../components/SpecsAccordion";
 import Toast, { BaseToast } from 'react-native-toast-message';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import Carcolorgallery from "../../../components/carcolorgallery";
+import CarImageGallery from "../../../components/CarImageGallery";
 
 const { width } = Dimensions.get("window");
 
@@ -542,20 +543,10 @@ const CarDetails = () => {
         ),
         images: () => (
             <View style={styles.tabContent}>
-                <Text style={styles.tabTitle}>Images</Text>
-                {CarGallery.length > 0 ? (
-                    <FlatList
-                        data={CarGallery}
-                        renderItem={renderImageItem}
-                        keyExtractor={(item, index) => index.toString()}
-                        initialNumToRender={5}
-                        windowSize={5}
-                        removeClippedSubviews={true}
-                        getItemLayout={getImageItemLayout}
-                    />
-                ) : (
-                    <Text>No images available.</Text>
-                )}
+                <Text className="text-xl font-rubik-bold px-4 my-3">
+                    {CarData.brandname} {CarData.carname} Images
+                </Text>
+                <CarImageGallery id={CarId} />
             </View>
         ),
         pros: () => (
