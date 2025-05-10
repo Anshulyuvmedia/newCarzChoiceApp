@@ -1,4 +1,4 @@
-import { StyleSheet, Image, Text, TouchableOpacity, View, ScrollView, Dimensions, Platform, ActivityIndicator, Share, FlatList } from "react-native";
+import { StyleSheet, Image, Text, TouchableOpacity, View, ScrollView, Dimensions, ActivityIndicator, Share, FlatList } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import icons from "@/constants/icons";
 import React, { useEffect, useState, useRef, useMemo } from 'react';
@@ -13,6 +13,7 @@ import FeaturesAccordion from "../../../components/FeaturesAccordion";
 import SpecsAccordion from "../../../components/SpecsAccordion";
 import Toast, { BaseToast } from 'react-native-toast-message';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+import Carcolorgallery from "../../../components/carcolorgallery";
 
 const { width } = Dimensions.get("window");
 
@@ -31,13 +32,113 @@ const CarDetails = () => {
     const router = useRouter();
 
     const toastConfig = {
-        success: (props) => ( <BaseToast {...props} style={{ borderLeftColor: "green" }} text1Style={{ fontSize: 16, fontWeight: "bold", }} text2Style={{ fontSize: 14, }}/> ),
-        error: (props) => ( <BaseToast {...props} style={{ borderLeftColor: "red" }} text1Style={{ fontSize: 16, fontWeight: "bold", }} text2Style={{ fontSize: 14, }} /> ),
+        success: (props) => (
+            <BaseToast
+                {...props}
+                style={{ borderLeftColor: "green" }}
+                text1Style={{ fontSize: 16, fontWeight: "bold" }}
+                text2Style={{ fontSize: 14 }}
+            />
+        ),
+        error: (props) => (
+            <BaseToast
+                {...props}
+                style={{ borderLeftColor: "red" }}
+                text1Style={{ fontSize: 16, fontWeight: "bold" }}
+                text2Style={{ fontSize: 14 }}
+            />
+        ),
     };
 
-    const handleEditPress = () => {
-        router.push(`/dashboard/editvehicle/${CarId}`);
+    const shareCar = async () => {
+        try {
+            const CarUrl = `https://carzchoice.com/carlistingdetails/${CarId}`;
+            const message = `View my Car: ${CarUrl}`;
+
+            const result = await Share.share({
+                message: message,
+                url: CarUrl,
+                title: "Check out this Car!",
+            });
+            if (result.action === Share.sharedAction) {
+                console.log("Car shared successfully!");
+            } else if (result.action === Share.dismissedAction) {
+                console.log("Share dismissed.");
+            }
+        } catch (error) {
+            console.error("Error sharing Car:", error);
+        }
     };
+
+    // Set the navigation header options when CarData is available
+    useEffect(() => {
+        if (CarData) {
+            navigation.setOptions({
+                headerShown: true,
+                title: `${CarData.brandname} ${CarData.carname}`,
+                headerStyle: {
+                    backgroundColor: '#a62325',
+                    shadowColor: '#000', // Add shadow for iOS
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 4,
+                    elevation: 4, // Add shadow for Android
+                },
+                headerTintColor: '#fff',
+                headerTitleStyle: {
+                    fontWeight: 'bold',
+                    fontSize: 18,
+                },
+                headerTitleAlign: 'center',
+                headerRight: () => (
+                    <View style={{ flexDirection: 'row', marginRight: 16, alignItems: 'center' }}>
+                        {CarData.roleid === loggedinUserId && (
+                            <Text
+                                style={{
+                                    backgroundColor: CarData.status === 'published' ? '#DCFCE7' : '#FEE2E2',
+                                    color: CarData.status === 'published' ? '#15803D' : '#B91C1C',
+                                    borderWidth: 1,
+                                    borderColor: CarData.status === 'published' ? 'rgba(22, 163, 74, 0.2)' : 'rgba(185, 28, 28, 0.2)',
+                                    borderRadius: 6,
+                                    paddingHorizontal: 8,
+                                    paddingVertical: 4,
+                                    fontSize: 12,
+                                    fontWeight: '500',
+                                    textTransform: 'capitalize',
+                                    marginRight: 12,
+                                }}
+                            >
+                                {CarData.status}
+                            </Text>
+                        )}
+                        <TouchableOpacity onPress={shareCar}>
+                            <Image source={icons.send} style={{ width: 28, height: 28 }} />
+                        </TouchableOpacity>
+                    </View>
+                ),
+            });
+        } else {
+            navigation.setOptions({
+                headerShown: true,
+                title: 'Car Details',
+                headerStyle: {
+                    backgroundColor: '#a62325',
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 4,
+                    elevation: 4,
+                },
+                headerTintColor: '#fff',
+                headerTitleStyle: {
+                    fontWeight: 'bold',
+                    fontSize: 18,
+                },
+                headerTitleAlign: 'center',
+            });
+        }
+    }, [CarData, navigation]);
+
 
     const fetchUserData = async () => {
         try {
@@ -76,11 +177,10 @@ const CarDetails = () => {
                 remarks: `Interested in ${CarData?.manufactureyear} ${CarData?.brandname} ${CarData?.carname} ${CarData?.modalname}`,
             };
 
-            // Placeholder API call to submit enquiry
             const response = await axios.post('https://carzchoice.com/api/submit-enquiry', enquiryData);
             if (response.data?.success) {
                 Toast.show({ type: 'success', text1: 'Success', text2: 'Enquiry submitted successfully!' });
-                router.push({ pathname: "/chat" }); // Navigate to chat after successful enquiry
+                router.push({ pathname: "/chat" });
             } else {
                 throw new Error(response.data?.message || 'Failed to submit enquiry.');
             }
@@ -89,26 +189,6 @@ const CarDetails = () => {
             Toast.show({ type: 'error', text1: 'Error', text2: error.message || 'An error occurred. Please try again.' });
         } finally {
             setLoading(false);
-        }
-    };
-
-    const shareCar = async () => {
-        try {
-            const CarUrl = `https://carzchoice.com/carlistingdetails/${CarId}`;
-            const message = `View my Car: ${CarUrl}`;
-
-            const result = await Share.share({
-                message: message,
-                url: CarUrl,
-                title: "Check out this Car!",
-            });
-            if (result.action === Share.sharedAction) {
-                console.log("Car shared successfully!");
-            } else if (result.action === Share.dismissedAction) {
-                console.log("Share dismissed.");
-            }
-        } catch (error) {
-            console.error("Error sharing Car:", error);
         }
     };
 
@@ -310,15 +390,21 @@ const CarDetails = () => {
         }
     ];
 
-    const renderImageItem = ({ item }) => (
-        <Image
-            source={{ uri: item }}
-            style={styles.tabImage}
-        />
-    );
+    const renderImageItem = ({ item }) => {
+        // console.log("Image item:", item);
+        return (
+            <View>
+                <Image
+                    source={{ uri: item }}
+                    style={styles.tabImage}
+                />
+                <Text>{item.colorname}</Text>
+            </View>
+        )
+    };
 
     const getImageItemLayout = (data, index) => ({
-        length: 220, // Height of each image (200 + 10 margin)
+        length: 220,
         offset: 220 * index,
         index,
     });
@@ -330,34 +416,8 @@ const CarDetails = () => {
                     <Text className="text-gray-500">No car details available</Text>
                 ) : (
                     <>
-                        <View className="mt-3">
+                        <View className="">
                             <View className="relative w-full">
-                                <View
-                                    className="z-50 absolute inset-x-7"
-                                    style={{ top: Platform.OS === "ios" ? 70 : 20 }}
-                                >
-                                    <View className="flex flex-row items-center w-full justify-between">
-                                        <TouchableOpacity
-                                            onPress={() => router.back()}
-                                            className="flex flex-row bg-white rounded-full size-11 items-center justify-center"
-                                        >
-                                            <Image source={icons.backArrow} className="size-5" />
-                                        </TouchableOpacity>
-                                        <View className="flex flex-row items-center gap-3">
-                                            {CarData.roleid === loggedinUserId && (
-                                                <Text className={`inline-flex items-center rounded-md capitalize px-2 py-1 text-xs font-rubik ring-1 ring-inset ${CarData.status === 'published' ? 'bg-green-50 text-green-700 ring-green-600/20' : 'bg-red-50 text-red-700 ring-red-600/20'}`}>
-                                                    {CarData.status}
-                                                </Text>
-                                            )}
-                                            <TouchableOpacity
-                                                onPress={shareCar}
-                                                className="flex flex-row bg-white rounded-full size-11 items-center justify-center"
-                                            >
-                                                <Image source={icons.send} className="size-7" />
-                                            </TouchableOpacity>
-                                        </View>
-                                    </View>
-                                </View>
                                 {CarGallery.length > 0 ? (
                                     <>
                                         <TouchableOpacity style={styles.arrowLeft} onPress={() => carouselRef.current?.prev()}>
@@ -384,10 +444,10 @@ const CarDetails = () => {
                                     </View>
                                 )}
                             </View>
-                            <Text className="text-xl font-rubik-bold px-3 mt-3">
+                            <Text className="text-xl font-rubik-bold px-4 mt-3">
                                 {CarData.brandname} {CarData.carname}
                             </Text>
-                            <View className="flex-row flex-wrap px-3 mt-3">
+                            <View className="flex-row flex-wrap px-4 mt-3">
                                 {carMeta.map((item) => (
                                     <View key={item.id} className="flex-row items-center mr-7 mb-2">
                                         <View className="flex items-center justify-center bg-primary-100 rounded-full size-10">
@@ -399,7 +459,7 @@ const CarDetails = () => {
                                     </View>
                                 ))}
                             </View>
-                            <View className="flex-row border-t-1 mt-4 px-3">
+                            <View className="flex-row border-t-1 mt-4 px-4">
                                 <Text className="text-black-300 text-base font-rubik-medium mb-1 me-3">Price</Text>
                                 <Text className="text-primary-300 text-base font-rubik-bold">
                                     {new Intl.NumberFormat('en-IN', {
@@ -410,7 +470,7 @@ const CarDetails = () => {
                                 </Text>
                             </View>
                         </View>
-                        <View className="flex flex-wrap flex-row mt-4">
+                        <View className="flex flex-wrap flex-row mt-4 px-4">
                             {carDetails.map((item, index) => (
                                 <View
                                     key={item.key}
@@ -432,15 +492,6 @@ const CarDetails = () => {
         ),
         price: () => (
             <ScrollView style={styles.tabContent}>
-                {/* <Text style={styles.tabTitle}>Price Details</Text>
-                <Text className="text-primary-300 text-base font-rubik-bold text-center">
-                    {CarData?.price ? new Intl.NumberFormat('en-IN', {
-                        style: 'currency',
-                        currency: 'INR',
-                        maximumFractionDigits: 0,
-                    }).format(CarData.price) : 'Price not available'}
-                </Text> */}
-
                 <MortgageCalculator totalprice={Number(CarData?.price || 0)} />
             </ScrollView>
         ),
@@ -457,10 +508,16 @@ const CarDetails = () => {
             </ScrollView>
         ),
         colours: () => (
-            <ScrollView style={styles.tabContent}>
-                <Text style={styles.tabTitle}>Colours</Text>
-                <Text>Available colours will be added here.</Text>
-            </ScrollView>
+            <View style={styles.tabContent}>
+                <View className="px-2 my-4">
+                    <Text className="text-xl font-rubik-bold px-4 my-3">
+                        {CarData.brandname} {CarData.carname}
+                    </Text>
+                    <ScrollView className="">
+                        <Carcolorgallery id={CarId} />
+                    </ScrollView>
+                </View>
+            </View>
         ),
         specs: () => (
             <ScrollView style={styles.tabContent}>
@@ -574,14 +631,6 @@ const CarDetails = () => {
 
             <View style={styles.bottomButtonBar}>
                 <View className="flex flex-row justify-between gap-4">
-
-                    {/* <TouchableOpacity
-                        onPress={handleEditPress}
-                        className="flex-1 flex-row items-center justify-center bg-green-600 py-3 rounded-full shadow-sm"
-                    >
-                        <Image source={icons.bestprice} className="w-5 h-5 mr-2" />
-                        <Text className="text-white text-lg font-rubik-bold">Edit Vehicle</Text>
-                    </TouchableOpacity> */}
                     <TouchableOpacity
                         onPress={handleChatPress}
                         className="flex-1 flex-row items-center justify-center bg-green-600 py-3 rounded-full shadow-sm"
@@ -611,7 +660,6 @@ const CarDetails = () => {
                             </>
                         )}
                     </TouchableOpacity>
-
                 </View>
             </View>
         </View>
@@ -673,7 +721,6 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     tabContent: {
-        padding: 16,
         backgroundColor: '#f8f8f8',
         flexGrow: 1,
     },
@@ -681,6 +728,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 10,
+        padding: 20,
     },
     tabImage: {
         width: '100%',
