@@ -1,10 +1,10 @@
 import React, { useCallback } from 'react';
 import { StyleSheet, Text, View, FlatList } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useNavigation } from '@react-navigation/native';
 import { Card } from '@/components/Cards';
 
 const SimilarCars = ({ data }) => {
-    const router = useRouter();
+    const navigation = useNavigation();
 
     // Handle cases where data might be undefined or not an array
     if (!data || !Array.isArray(data) || data.length === 0) {
@@ -19,10 +19,22 @@ const SimilarCars = ({ data }) => {
     // Memoized handleCardPress
     const handleCardPress = useCallback(
         (id) => {
+            navigation.navigate('VehicleDetails', { id });
+        },
+        [navigation]
+    );
+
+    /*
+    // Alternative for Expo Router:
+    import { useRouter } from 'expo-router';
+    const router = useRouter();
+    const handleCardPress = useCallback(
+        (id) => {
             router.push(`/vehicles/${id}`);
         },
         [router]
     );
+    */
 
     return (
         <View style={styles.container}>
@@ -35,8 +47,6 @@ const SimilarCars = ({ data }) => {
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.listContent}
                 columnWrapperStyle={styles.columnWrapper}
-                initialNumToRender={6} // Render a few items initially for performance
-                maxToRenderPerBatch={10} // Control rendering batch size
             />
         </View>
     );

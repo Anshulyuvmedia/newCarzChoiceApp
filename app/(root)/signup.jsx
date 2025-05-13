@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
     color: '#00000',
     textAlign: 'center',
   },
-  highlight: { color: '#a62325', fontWeight: 700 },
+  highlight: { color: '#0061ff', fontWeight: 700 },
   orText: { fontSize: 14, fontFamily: 'Rubik-Regular', color: '#555', textAlign: 'center', marginTop: 30 },
   googleButton: { backgroundColor: 'lightgrey', borderRadius: 50, paddingVertical: 15, marginTop: 20, alignItems: 'center', width: '100%' },
   googleContent: { flexDirection: 'row', alignItems: 'center' },

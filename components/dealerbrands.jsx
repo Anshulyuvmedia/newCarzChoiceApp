@@ -116,7 +116,7 @@ const Dealerbrands = () => {
 
             {/* Brand Grid */}
             {loading ? (
-                <ActivityIndicator size="large" color="#a62325" style={{ marginTop: 100 }} />
+                <ActivityIndicator size="large" color="#0061ff" style={{ marginTop: 100 }} />
             ) : (
                 <FlatList
                     data={filteredBrands}
@@ -137,8 +137,8 @@ export default Dealerbrands;
 
 const styles = StyleSheet.create({
     brandImg: {
-        width: 50,
-        height: 50,
+        width: 60,
+        height: 60,
         resizeMode: "contain",
     },
 });

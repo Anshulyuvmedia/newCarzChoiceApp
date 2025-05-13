@@ -130,7 +130,7 @@ const
 
                 <RBSheet
                     ref={refRBSheet}
-                    height={550}
+                    height={200}
                     openDuration={150}
                     closeOnDragDown
                     customStyles={{
@@ -174,8 +174,8 @@ const
                             {displayCity ? `Looking in ${displayCity}` : 'Press detect to find your current location'}
                         </Text>
 
-                        <Text className="text-lg font-rubik text-black-300 mb-2">Popular Cities</Text>
-                        <LocationList />
+                        {/* <Text className="text-lg font-rubik text-black-300 mb-2">Popular Cities</Text>
+                        <LocationList /> */}
 
                         <TouchableOpacity
                             disabled={loading || !selectedCity}

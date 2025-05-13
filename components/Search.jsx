@@ -1,153 +1,236 @@
-import { View, TouchableOpacity, TouchableWithoutFeedback, Keyboard, Image, TextInput, Text, StyleSheet, ActivityIndicator, FlatList } from "react-native";
-import { useLocalSearchParams, router, usePathname } from "expo-router";
+import { View, TouchableOpacity, Image, TextInput, Text, StyleSheet, ActivityIndicator, FlatList } from "react-native";
+import { useRouter } from "expo-router";
 import React, { useState, useRef, useEffect } from "react";
 import RBSheet from "react-native-raw-bottom-sheet";
 import icons from "@/constants/icons";
+import images from '@/constants/images';
 import axios from "axios";
-import Filters from "./Filters";
-import LocationScroll from "./LocationScroll";
+import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons } from "@expo/vector-icons";
+import Toast from "react-native-toast-message";
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 
-const Search = () => {
+const Search = ({ selectedFilters = {}, setSelectedFilters }) => {
     const refRBSheet = useRef(null);
-    const params = useLocalSearchParams();
+    const router = useRouter();
 
-    const [searchText, setSearchText] = useState("");
-    const [filteredCities, setFilteredCities] = useState([]);
     const [loading, setLoading] = useState(false);
-    const inputRef = useRef(null);
-
     const [brands, setBrands] = useState([]);
-    const [selectedBrand, setSelectedBrand] = useState(params.brand || ''); // ✅ Retain value
-
     const [budgets, setBudgets] = useState([]);
-    const [selectedBudget, setSelectedBudget] = useState(params.budget || ""); // ✅ Retain value
-
     const [fuelTypes, setFuelTypes] = useState([]);
-    const [selectedFuelType, setSelectedFuelType] = useState(params.fuelType || ""); // ✅ Retain value
-
     const [transmissions, setTransmissions] = useState([]);
-    const [selectedTransmission, setSelectedTransmission] = useState(params.transmission || ""); // ✅ Retain value
-
-    const [color, setColor] = useState([]);
-    const [selectedColor, setSelectedColor] = useState(params.color || ""); // ✅ Retain value
-
-    const [cityData, setCityData] = useState([]);
-    const [selectedCity, setSelectedCity] = useState(params.city || ""); // ✅ Retain value
-
+    const [bodyTypes, setBodyTypes] = useState([]);
 
     useEffect(() => {
-        // getCityList();
         getMasterDataLists();
     }, []);
-
-    // const getCityList = async () => {
-    //     setLoading(true);
-    //     try {
-    //         const response = await axios.get("https://carzchoice.com/api/getCityList");
-    //         if (response.data && Array.isArray(response.data.data)) {
-    //             const formattedCities = response.data.data.map((city, index) => ({
-    //                 label: city.District || `City ${index}`,
-    //                 value: city.District || index,
-    //             }));
-    //             setCityData(formattedCities);
-    //         } else {
-    //             console.error("Unexpected API response format:", response.data);
-    //         }
-    //     } catch (error) {
-    //         console.error("Error fetching city list:", error);
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
 
     const getMasterDataLists = async () => {
         setLoading(true);
         try {
             const response = await axios.get("https://carzchoice.com/api/getMasterDataLists");
-            // console.log("Full API Response:", response.data);
-
             if (response.data && response.data.data) {
-                const { brands, budgets, fuelTypes, transmissions, color, city } = response.data.data;
+                const { brands, budgets, fuelTypes, transmissions, bodyType } = response.data.data;
+                const fixedBodyTypes = bodyType.map(item => ({
+                    ...item,
+                    label: item.label === "Compect SUV" ? "Compact SUV" : item.label,
+                    value: item.label === "Compect SUV" ? "Compact SUV" : item.value,
+                }));
 
                 setBrands(brands || []);
                 setBudgets(budgets || []);
                 setFuelTypes(fuelTypes || []);
                 setTransmissions(transmissions || []);
-                setCityData(city || []);
-                setColor(color || []);
-
-                // console.log("fuelTypes:", fuelTypes);
+                setBodyTypes(fixedBodyTypes || []);
             } else {
-                console.error("Unexpected API response format:", response.data);
+                throw new Error("Unexpected API response format");
             }
         } catch (error) {
             console.error("Error fetching master data:", error);
+            Toast.show({
+                type: "error",
+                text1: "Error",
+                text2: "Failed to fetch filter data. Please try again.",
+            });
         } finally {
             setLoading(false);
         }
     };
 
     const handleSearch = () => {
-        const filters = {
-            city: selectedCity,
-            budget: selectedBudget,
-            fuelType: selectedFuelType,
-            transmission: selectedTransmission,
-            color: selectedColor,
-            brand: selectedBrand,
-        };
-
-        // console.log("Applied Filters:", filters);
-
+        if (!Object.values(selectedFilters).some(val => val)) {
+            Toast.show({
+                type: "info",
+                text1: "No Filters Selected",
+                text2: "Please select at least one filter to search.",
+            });
+            return;
+        }
         if (refRBSheet.current) {
             refRBSheet.current.close();
         }
-
         router.push({
             pathname: "explore",
-            params: filters,
+            params: selectedFilters,
+        });
+        Toast.show({
+            type: "success",
+            text1: "Filters Applied",
+            text2: "Your vehicle search filters have been applied successfully.",
         });
     };
 
-    const citySearch = (text) => {
-        setSearchText(text);
-        if (text.length > 0) {
-            const filtered = cityData.filter((city) =>
-                city.district.toLowerCase().includes(text.toLowerCase())
-            );
-            setFilteredCities(filtered);
-        } else {
-            setFilteredCities(cityData);
-        }
+    const resetFilters = () => {
+        setSelectedFilters({
+            budget: null,
+            fuelType: null,
+            transmission: null,
+            brand: null,
+            bodyType: null,
+        });
+        Toast.show({
+            type: "info",
+            text1: "Filters Reset",
+            text2: "All search filters have been cleared.",
+        });
     };
 
+    const FilterChip = React.memo(({ item, isSelected, onPress, labelKey, icon = false }) => {
+        const scale = useSharedValue(1);
+        const [imageError, setImageError] = useState(false);
 
+        const animatedStyle = useAnimatedStyle(() => ({
+            transform: [{ scale: withSpring(scale.value) }],
+        }));
 
+        const handlePress = () => {
+            scale.value = 0.95;
+            onPress();
+        };
+
+        return (
+            <Animated.View style={[animatedStyle]}>
+                <TouchableOpacity
+                    onPress={handlePress}
+                    style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        paddingHorizontal: 14,
+                        paddingVertical: 8,
+                        borderRadius: 50,
+                        borderWidth: 1,
+                        borderColor: isSelected ? "#0061ff" : "#ddd",
+                        backgroundColor: isSelected ? "#e3f2fd" : "#f8f9fa",
+                        marginRight: 10,
+                    }}
+                    accessibilityLabel={`${isSelected ? "Deselect" : "Select"} ${item[labelKey]}`}
+                >
+                    {icon && (
+                        <Ionicons
+                            name={icon}
+                            size={18}
+                            color={isSelected ? "#0061ff" : "#555"}
+                            style={{ marginRight: 6 }}
+                        />
+                    )}
+                    {item.iconimage && !icon && !imageError ? (
+                        <Image
+                            style={{
+                                width: 24,
+                                height: 24,
+                                marginRight: 6,
+                                resizeMode: "contain",
+                                borderRadius: 50,
+                            }}
+                            source={{ uri: `https://carzchoice.com/assets/backend-assets/images/${item.iconimage}` }}
+                            onError={() => {
+                                console.error(`Failed to load image for ${item[labelKey]}`);
+                                setImageError(true);
+                            }}
+                            defaultSource={images.reactlogo}
+                        />
+                    ) : item.iconimage && !icon && imageError ? (
+                        <Image
+                            style={{
+                                width: 24,
+                                height: 24,
+                                marginRight: 6,
+                                resizeMode: "contain",
+                                borderRadius: 50,
+                            }}
+                            source={images.reactlogo}
+                        />
+                    ) : null}
+                    <Text
+                        style={{
+                            fontSize: 14,
+                            fontWeight: isSelected ? "600" : "400",
+                            color: isSelected ? "#0061ff" : "#1a1a1a",
+                            textTransform: "capitalize",
+                        }}
+                    >
+                        {item[labelKey]}
+                    </Text>
+                    {isSelected && (
+                        <Ionicons
+                            name="checkmark-circle"
+                            size={18}
+                            color="#0061ff"
+                            style={{ marginLeft: 6 }}
+                        />
+                    )}
+                </TouchableOpacity>
+            </Animated.View>
+        );
+    });
+
+    // Fallback for selectedFilters
+    const filters = selectedFilters || {
+        budget: null,
+        fuelType: null,
+        transmission: null,
+        brand: null,
+        bodyType: null,
+    };
 
     return (
-        <View className="flex-1 ">
-
-            <TouchableOpacity onPress={() => refRBSheet.current.open()}>
-                <View className="flex flex-row items-center justify-between w-full px-4 py-3 rounded-full bg-accent-100 border border-primary-200">
-                    <View className="flex-1 flex flex-row items-center justify-start">
-                        <Image source={icons.search} className="size-6 " />
+        <View className="flex-1">
+            {loading && (
+                <View style={styles.loadingOverlay}>
+                    <ActivityIndicator size="large" color="#0061ff" />
+                </View>
+            )}
+            <TouchableOpacity
+                onPress={() => refRBSheet.current.open()}
+                style={styles.searchBar}
+                accessibilityLabel="Open search filters"
+            >
+                <LinearGradient
+                    colors={["#ffffff", "#f0f0f0"]}
+                    style={styles.searchBarGradient}
+                >
+                    <View className="flex-row items-center justify-start flex-1">
+                        <Image source={icons.search} className="w-6 h-6" />
                         <TextInput
                             value={[
-                                selectedCity, selectedBudget, selectedTransmission, selectedFuelType,
-                                selectedColor, selectedBrand,
+                                filters.budget,
+                                filters.transmission,
+                                filters.fuelType,
+                                filters.brand,
+                                filters.bodyType,
                             ]
-                                .filter((val) => val) // Filter out empty values
+                                .filter((val) => val)
                                 .join(", ")}
                             editable={false}
                             placeholder="Search Vehicle..."
-                            className="text-sm font-rubik-medium text-black-300 ml-2 flex-1 capitalize "
+                            className="text-sm font-rubik-medium text-gray-800 ml-3 flex-1 capitalize"
                         />
                     </View>
-                    <Image source={icons.filter} className="size-5" />
-                </View>
+                    <Image source={icons.filter} className="w-5 h-5" />
+                </LinearGradient>
             </TouchableOpacity>
 
-            {/* RBSheet for Search */}
             <RBSheet
                 ref={refRBSheet}
                 height={600}
@@ -155,259 +238,307 @@ const Search = () => {
                 closeOnDragDown={true}
                 customStyles={{
                     container: {
-                        borderTopLeftRadius: 15,
-                        borderTopRightRadius: 15,
-                        padding: 15,
-                        backgroundColor: "white",
-                    }
+                        borderTopLeftRadius: 20,
+                        borderTopRightRadius: 20,
+                        paddingHorizontal: 0,
+                        paddingBottom: 20,
+                        backgroundColor: "#fff",
+                    },
+                    draggableIcon: {
+                        backgroundColor: "#ddd",
+                        width: 50,
+                        height: 5,
+                        borderRadius: 3,
+                        marginVertical: 10,
+                    },
                 }}
             >
                 <View>
-                    <View className="flex flex-row justify-between items-center mb-3">
-                        <Text className="text-lg font-rubik-bold text-black-300">
-                            Filter
+                    <LinearGradient
+                        colors={["#0061ff", "#003087"]}
+                        style={styles.header}
+                    >
+                        <Text className="text-xl font-rubik-bold text-white">
+                            Filter Your Search
                         </Text>
-                        <TouchableOpacity onPress={() => refRBSheet.current.close()}>
-                            <Text className="text-lg font-rubik-bold text-red-500">
-                                Close
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    <View className="flex flex-row items-center w-full bg-blue-50 rounded-full px-3 py-3">
-                        <Image source={icons.location} className="size-6" />
-                        <TextInput
-                            ref={inputRef}
-                            value={searchText}
-                            onChangeText={citySearch}
-                            placeholder="Search In Your City..."
-                            className="flex-1 ml-2 text-black-300 text-sm capitalize"
-                        />
-                    </View>
-
-                    {filteredCities.length > 0 && (
-                        <FlatList
-                            data={filteredCities}  // ✅ Use filteredCities instead of cityData
-                            keyExtractor={(item, index) => `city-${index}`}
-                            keyboardShouldPersistTaps="handled"
-                            style={{ backgroundColor: "#fff", borderRadius: 10, marginTop: 5, maxHeight: 150 }}
-                            renderItem={({ item }) => (
-                                <TouchableOpacity
-                                    onPress={() => {
-                                        setSelectedCity(item.district);
-                                        setSearchText(item.district);
-                                        setFilteredCities([]);
-
-                                    }}
-                                    className="p-2 border-b border-gray-200 bg-primary-100"
+                        <View className="flex-row">
+                            <TouchableOpacity
+                                onPress={resetFilters}
+                                style={styles.headerButton}
+                                accessibilityLabel="Reset all filters"
+                            >
+                                <LinearGradient
+                                    colors={["#ffffff", "#f0f0f0"]}
+                                    style={styles.headerButtonGradient}
                                 >
-                                    <Text className="text-black-300 capitalize">{item.district}</Text>
-                                </TouchableOpacity>
-                            )}
-                        />
-                    )}
+                                    <Text className="text-sm font-rubik-medium text-gray-800">
+                                        Reset
+                                    </Text>
+                                </LinearGradient>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => refRBSheet.current.close()}
+                                style={[styles.headerButton, { marginLeft: 10 }]}
+                                accessibilityLabel="Close filter sheet"
+                            >
+                                <LinearGradient
+                                    colors={["#ff4444", "#cc0000"]}
+                                    style={styles.headerButtonGradient}
+                                >
+                                    <Text className="text-sm font-rubik-medium text-white">
+                                        Close
+                                    </Text>
+                                </LinearGradient>
+                            </TouchableOpacity>
+                        </View>
+                    </LinearGradient>
 
-                    <LocationScroll />
-
-                    <Text className="text-lg font-rubik-bold text-black-300 mt-3">
-                        Search by brand
+                    <Text className="text-lg font-rubik-bold text-gray-800 mt-5 mx-4">
+                        Search by Brand
                     </Text>
-                    {brands.length > 0 && (
+                    {brands.length > 0 ? (
                         <FlatList
                             data={brands}
                             horizontal={true}
                             showsHorizontalScrollIndicator={false}
-                            keyExtractor={(item) => `brand-${item.id}`} // ✅ Unique key
+                            keyExtractor={(item) => `brand-${item.id}`}
                             keyboardShouldPersistTaps="handled"
-                            style={{ backgroundColor: "#fff", borderRadius: 10, marginTop: 5, maxHeight: 150 }}
+                            style={{ marginTop: 10, marginStart: 10 }}
                             renderItem={({ item }) => (
-                                <TouchableOpacity
-                                    key={item.id.toString()} // ✅ Ensure unique key
-                                    onPress={() => setSelectedBrand(selectedBrand === item.label ? "" : item.label)} // ✅ Fix function call
-                                    style={{
-                                        flexDirection: "row",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        paddingHorizontal: 16,
-                                        paddingVertical: 6,
-                                        borderRadius: 20,
-                                        borderWidth: 1,
-                                        borderColor: selectedBrand === item.label ? "#007bff" : "#ddd",
-                                        backgroundColor: selectedBrand === item.label ? "#e3f2fd" : "#f8f9fa",
-                                        marginRight: 8,
-                                    }}
-                                >
-                                    {item.iconimage ? (
-                                        <Image
-                                            style={{
-                                                width: 24,
-                                                height: 24,
-                                                marginRight: 6,
-                                                resizeMode: "contain",
-                                                borderRadius: 50,
-                                            }}
-                                            source={{ uri: `https://carzchoice.com/assets/backend-assets/images/${item.iconimage}` }}
-                                        />
-                                    ) : (
-                                        <Text style={{ fontSize: 12, color: "#555" }}>No Image</Text>
-                                    )}
-
-                                    <Text style={{
-                                        fontSize: 14,
-                                        fontWeight: selectedBrand === item.label ? "bold" : "normal",
-                                        color: selectedBrand === item.label ? "black" : "#000",
-                                    }}>
-                                        {item.label}
-                                    </Text>
-                                </TouchableOpacity>
+                                <FilterChip
+                                    item={item}
+                                    isSelected={filters.brand === item.label}
+                                    onPress={() =>
+                                        setSelectedFilters(prev => ({
+                                            ...prev,
+                                            brand: prev?.brand === item.label ? null : item.label,
+                                        }))
+                                    }
+                                    labelKey="label"
+                                />
                             )}
                         />
+                    ) : (
+                        <Text className="text-sm text-gray-500 mx-4 mt-2">
+                            No brands available
+                        </Text>
                     )}
 
-                    <Text className="text-lg font-rubik-bold text-black-300 mt-3">
+                    <Text className="text-lg font-rubik-bold text-gray-800 mt-5 mx-4">
                         Budget
                     </Text>
-                    {budgets.length > 0 && (
+                    {budgets.length > 0 ? (
                         <FlatList
                             data={budgets}
                             horizontal={true}
                             showsHorizontalScrollIndicator={false}
-                            keyExtractor={(item, index) => `budget-${index}`} // Unique key
+                            keyExtractor={(item, index) => `budget-${index}`}
                             keyboardShouldPersistTaps="handled"
-                            style={{ backgroundColor: "#fff", borderRadius: 10, marginTop: 5, maxHeight: 150 }}
+                            style={{ marginTop: 10, marginStart: 10 }}
                             renderItem={({ item }) => (
-                                <TouchableOpacity
-                                    onPress={() => setSelectedBudget(selectedBudget === item.label ? "" : item.label)}
-                                    style={{
-                                        paddingHorizontal: 15,
-                                        paddingVertical: 5,
-                                        borderRadius: 50,
-                                        marginEnd: 10,
-                                        borderWidth: 1,
-                                        borderColor: selectedBudget === item.label ? "#007bff" : "#ddd",
-                                        backgroundColor: selectedBudget === item.label ? "#e3f2fd" : "#f8f9fa",
-                                    }}
-                                >
-                                    <Text style={{ color: "#000", textTransform: 'capitalize', fontWeight: selectedBudget === item.label ? "bold" : "normal" }}>
-                                        {item.label}
-                                    </Text>
-                                </TouchableOpacity>
+                                <FilterChip
+                                    item={item}
+                                    isSelected={filters.budget === item.label}
+                                    onPress={() =>
+                                        setSelectedFilters(prev => ({
+                                            ...prev,
+                                            budget: prev?.budget === item.label ? null : item.label,
+                                        }))
+                                    }
+                                    labelKey="label"
+                                />
                             )}
                         />
+                    ) : (
+                        <Text className="text-sm text-gray-500 mx-4 mt-2">
+                            No budgets available
+                        </Text>
                     )}
-                    <Text className="text-lg font-rubik-bold text-black-300 mt-3">
+
+                    <Text className="text-lg font-rubik-bold text-gray-800 mt-5 mx-4">
                         Transmission
                     </Text>
-                    {transmissions.length > 0 && (
+                    {transmissions.length > 0 ? (
                         <FlatList
                             data={transmissions}
                             horizontal={true}
                             showsHorizontalScrollIndicator={false}
-                            keyExtractor={(item, index) => `budget-${index}`} // Unique key
+                            keyExtractor={(item, index) => `transmission-${index}`}
                             keyboardShouldPersistTaps="handled"
-                            style={{ backgroundColor: "#fff", borderRadius: 10, marginTop: 5, maxHeight: 150 }}
+                            style={{ marginTop: 10, marginStart: 10 }}
                             renderItem={({ item }) => (
-                                <TouchableOpacity
-                                    onPress={() => setSelectedTransmission(selectedTransmission === item.label ? "" : item.label)}
-
-                                    style={{
-                                        paddingHorizontal: 15,
-                                        paddingVertical: 5,
-                                        borderRadius: 50,
-                                        marginEnd: 10,
-                                        borderWidth: 1,
-                                        borderColor: selectedTransmission === item.label ? "#007bff" : "#ddd",
-                                        backgroundColor: selectedTransmission === item.label ? "#e3f2fd" : "#f8f9fa",
-                                    }}
-                                >
-                                    <Text style={{ color: "#000", fontWeight: selectedTransmission === item.label ? "bold" : "normal" }}>
-                                        {item.label}
-                                    </Text>
-                                </TouchableOpacity>
+                                <FilterChip
+                                    item={item}
+                                    isSelected={filters.transmission === item.label}
+                                    onPress={() =>
+                                        setSelectedFilters(prev => ({
+                                            ...prev,
+                                            transmission: prev?.transmission === item.label ? null : item.label,
+                                        }))
+                                    }
+                                    labelKey="value"
+                                    icon={
+                                        item.label.toLowerCase() === "automatic"
+                                            ? "car-sport"
+                                            : "cog"
+                                    }
+                                />
                             )}
                         />
+                    ) : (
+                        <Text className="text-sm text-gray-500 mx-4 mt-2">
+                            No transmissions available
+                        </Text>
                     )}
-                    <Text className="text-lg font-rubik-bold text-black-300 mt-3">
+
+                    <Text className="text-lg font-rubik-bold text-gray-800 mt-5 mx-4">
                         Fuel Type
                     </Text>
-                    {fuelTypes.length > 0 && (
+                    {fuelTypes.length > 0 ? (
                         <FlatList
                             data={fuelTypes}
                             horizontal={true}
                             showsHorizontalScrollIndicator={false}
                             keyExtractor={(item) => `fueltype-${item.id}`}
                             keyboardShouldPersistTaps="handled"
-                            style={{ backgroundColor: "#fff", borderRadius: 10, marginTop: 5, maxHeight: 150 }}
+                            style={{ marginTop: 10, marginStart: 10 }}
                             renderItem={({ item }) => (
-                                <TouchableOpacity
-                                    onPress={() => setSelectedFuelType(selectedFuelType === item.label ? "" : item.label)}
-
-                                    style={{
-                                        flexDirection: "row",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        paddingHorizontal: 15,
-                                        paddingVertical: 5,
-                                        borderRadius: 50,
-                                        marginEnd: 10,
-                                        borderWidth: 1,
-                                        borderColor: selectedFuelType === item.label ? "#007bff" : "#ddd",
-                                        backgroundColor: selectedFuelType === item.label ? "#e3f2fd" : "#f8f9fa",
-                                    }}
-                                >
-
-                                    <Text style={{ color: "#000", fontWeight: selectedFuelType === item.label ? "bold" : "normal" }}>
-                                        {item.label}
-                                    </Text>
-                                </TouchableOpacity>
+                                <FilterChip
+                                    item={item}
+                                    isSelected={filters.fuelType === item.label}
+                                    onPress={() =>
+                                        setSelectedFilters(prev => ({
+                                            ...prev,
+                                            fuelType: prev?.fuelType === item.label ? null : item.label,
+                                        }))
+                                    }
+                                    labelKey="label"
+                                    icon={
+                                        item.label.toLowerCase().includes("petrol")
+                                            ? "water"
+                                            : item.label.toLowerCase().includes("diesel")
+                                                ? "water"
+                                                : item.label.toLowerCase().includes("cng")
+                                                    ? "leaf"
+                                                    : "flash"
+                                    }
+                                />
                             )}
                         />
+                    ) : (
+                        <Text className="text-sm text-gray-500 mx-4 mt-2">
+                            No fuel types available
+                        </Text>
                     )}
 
-                    <Text className="text-lg font-rubik-bold text-black-300 mt-3">
-                        Select Color
+                    <Text className="text-lg font-rubik-bold text-gray-800 mt-5 mx-4">
+                        Body Type
                     </Text>
-                    {color.length > 0 && (
+                    {bodyTypes.length > 0 ? (
                         <FlatList
-                            data={color}
+                            data={bodyTypes}
                             horizontal={true}
                             showsHorizontalScrollIndicator={false}
-                            keyExtractor={(item, index) => `color-${index}`} // ✅ Fixed keyExtractor
+                            keyExtractor={(item) => `bodytype-${item.id}`}
                             keyboardShouldPersistTaps="handled"
-                            style={{ backgroundColor: "#fff", borderRadius: 10, marginTop: 5, maxHeight: 150 }}
+                            style={{ marginTop: 10, marginStart: 10 }}
                             renderItem={({ item }) => (
-                                <TouchableOpacity
-                                    onPress={() => setSelectedColor(selectedColor === item.color ? "" : item.color)}
-
-                                    style={{
-                                        paddingHorizontal: 15,
-                                        paddingVertical: 5,
-                                        borderRadius: 50,
-                                        marginEnd: 10,
-                                        borderWidth: 1,
-                                        borderColor: selectedColor === item.color ? "#007bff" : "#ddd", // ✅ Fixed selection logic
-                                        backgroundColor: selectedColor === item.color ? "#e3f2fd" : "#f8f9fa",
-                                    }}
-                                >
-                                    <Text style={{ color: "#000", textTransform: 'capitalize', fontWeight: selectedColor === item.color ? "bold" : "normal" }}>
-                                        {item.color}  {/* ✅ Corrected property reference */}
-                                    </Text>
-                                </TouchableOpacity>
+                                <FilterChip
+                                    item={item}
+                                    isSelected={filters.bodyType === item.label}
+                                    onPress={() =>
+                                        setSelectedFilters(prev => ({
+                                            ...prev,
+                                            bodyType: prev?.bodyType === item.label ? null : item.label,
+                                        }))
+                                    }
+                                    labelKey="label"
+                                />
                             )}
                         />
+                    ) : (
+                        <Text className="text-sm text-gray-500 mx-4 mt-2">
+                            No body types available
+                        </Text>
                     )}
 
+                    <TouchableOpacity
+                        onPress={handleSearch}
+                        style={styles.applyButton}
+                        accessibilityLabel="Apply search filters"
+                    >
+                        <LinearGradient
+                            colors={["#0061ff", "#003087"]}
+                            style={styles.applyButtonGradient}
+                        >
+                            {loading ? (
+                                <ActivityIndicator color="#fff" />
+                            ) : (
+                                <Text className="font-rubik-bold text-white text-center text-lg">
+                                    Apply Filters
+                                </Text>
+                            )}
+                        </LinearGradient>
+                    </TouchableOpacity>
                 </View>
-                <TouchableOpacity onPress={() => handleSearch()} className="p-2 rounded-lg bg-primary-300 mt-5">
-                    {loading ? <ActivityIndicator color="white" /> : <Text className="font-rubik-bold text-white text-center">Apply Filters</Text>}
-                </TouchableOpacity>
             </RBSheet>
         </View>
     );
 };
 
-export default Search;
-
 const styles = StyleSheet.create({
-
+    searchBar: {
+        marginHorizontal: 15,
+        marginVertical: 5,
+        borderRadius: 50,
+    },
+    searchBarGradient: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        paddingHorizontal: 15,
+        paddingVertical: 12,
+        borderRadius: 50,
+        borderWidth: 1,
+        borderColor: "#ddd",
+    },
+    header: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        padding: 15,
+        borderRadius: 0,
+    },
+    headerButton: {
+        borderRadius: 8,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+    headerButtonGradient: {
+        paddingVertical: 6,
+        paddingHorizontal: 12,
+        borderRadius: 8,
+    },
+    applyButton: {
+        marginTop: 20,
+        borderRadius: 12,
+    },
+    applyButtonGradient: {
+        paddingVertical: 12,
+        borderRadius: 12,
+        alignItems: "center",
+        marginInline: 15,
+    },
+    loadingOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: "rgba(255, 255, 255, 0.8)",
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 1000,
+    },
 });
+
+export default Search;

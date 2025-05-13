@@ -104,7 +104,7 @@ const BannerSlider = () => {
                                 height: 8,
                                 borderRadius: 4,
                                 marginHorizontal: 4,
-                                backgroundColor: activeIndex === index ? '#a62325' : 'gray',
+                                backgroundColor: activeIndex === index ? '#0061ff' : 'gray',
                             }}
                         />
                     </Pressable>

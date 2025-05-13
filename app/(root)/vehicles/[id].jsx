@@ -15,6 +15,7 @@ import Toast, { BaseToast } from 'react-native-toast-message';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import Carcolorgallery from "../../../components/carcolorgallery";
 import CarImageGallery from "../../../components/CarImageGallery";
+import SimilarCars from "../../../components/SimilarCars";
 
 const { width } = Dimensions.get("window");
 
@@ -29,6 +30,7 @@ const CarDetails = () => {
     const carouselRef = useRef(null);
     const navigation = useNavigation();
     const [specifications, setSpecifications] = useState([]);
+    const [similarCarsData, setSimilarCarsData] = useState([]);
     const [features, setFeatures] = useState([]);
     const router = useRouter();
 
@@ -70,75 +72,6 @@ const CarDetails = () => {
             console.error("Error sharing Car:", error);
         }
     };
-
-    // Set the navigation header options when CarData is available
-    useEffect(() => {
-        if (CarData) {
-            navigation.setOptions({
-                headerShown: true,
-                title: `${CarData.brandname} ${CarData.carname}`,
-                headerStyle: {
-                    backgroundColor: '#a62325',
-                    shadowColor: '#000', // Add shadow for iOS
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 4,
-                    elevation: 4, // Add shadow for Android
-                },
-                headerTintColor: '#fff',
-                headerTitleStyle: {
-                    fontWeight: 'bold',
-                    fontSize: 18,
-                },
-                headerTitleAlign: 'center',
-                headerRight: () => (
-                    <View style={{ flexDirection: 'row', marginRight: 16, alignItems: 'center' }}>
-                        {CarData.roleid === loggedinUserId && (
-                            <Text
-                                style={{
-                                    backgroundColor: CarData.status === 'published' ? '#DCFCE7' : '#FEE2E2',
-                                    color: CarData.status === 'published' ? '#15803D' : '#B91C1C',
-                                    borderWidth: 1,
-                                    borderColor: CarData.status === 'published' ? 'rgba(22, 163, 74, 0.2)' : 'rgba(185, 28, 28, 0.2)',
-                                    borderRadius: 6,
-                                    paddingHorizontal: 8,
-                                    paddingVertical: 4,
-                                    fontSize: 12,
-                                    fontWeight: '500',
-                                    textTransform: 'capitalize',
-                                    marginRight: 12,
-                                }}
-                            >
-                                {CarData.status}
-                            </Text>
-                        )}
-                        <TouchableOpacity onPress={shareCar}>
-                            <Image source={icons.send} style={{ width: 28, height: 28 }} />
-                        </TouchableOpacity>
-                    </View>
-                ),
-            });
-        } else {
-            navigation.setOptions({
-                headerShown: true,
-                title: 'Car Details',
-                headerStyle: {
-                    backgroundColor: '#a62325',
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 4,
-                    elevation: 4,
-                },
-                headerTintColor: '#fff',
-                headerTitleStyle: {
-                    fontWeight: 'bold',
-                    fontSize: 18,
-                },
-                headerTitleAlign: 'center',
-            });
-        }
-    }, [CarData, navigation]);
 
 
     const fetchUserData = async () => {
@@ -207,7 +140,7 @@ const CarDetails = () => {
                 let apiData = response.data.data.cardetails;
                 let parsedSpecifications = [];
                 let parsedFeatures = [];
-
+                // console.log('similarcars variants', response.data.data.similarcars);
                 try {
                     if (Array.isArray(apiData.specifications) && apiData.specifications.length > 0) {
                         let parsedSpecData = JSON.parse(apiData.specifications[0]);
@@ -255,10 +188,11 @@ const CarDetails = () => {
                 } catch (error) {
                     console.error("❌ Error formatting images:", error);
                 }
-
                 setCarData(apiData);
                 setSpecifications(parsedSpecifications);
                 setFeatures(parsedFeatures);
+                setSimilarCarsData(response.data.data.similarcars);
+
             } else {
                 throw new Error("Car details not found in response.");
             }
@@ -296,7 +230,7 @@ const CarDetails = () => {
             {...props}
             scrollEnabled
             indicatorStyle={{ backgroundColor: 'white' }}
-            style={{ backgroundColor: '#a62325' }}
+            style={{ backgroundColor: '#0061ff' }}
             tabStyle={{ width: 'auto', paddingHorizontal: 16 }}
             labelStyle={{ fontSize: 14, fontWeight: 'bold' }}
             renderLabel={({ route, focused }) => (
@@ -491,23 +425,34 @@ const CarDetails = () => {
                 )}
             </ScrollView>
         ),
-        price: () => (
-            <ScrollView style={styles.tabContent}>
-                <MortgageCalculator totalprice={Number(CarData?.price || 0)} />
-            </ScrollView>
-        ),
+        price: () => {
+
+            return (
+                <View>
+                    <Text style={styles.tabTitle}>EMI Calculator</Text>
+                    <ScrollView style={styles.tabContent}>
+                        <MortgageCalculator totalprice={Number(CarData?.price || 0)} />
+                    </ScrollView>
+                </View>
+            )
+        },
         compare: () => (
             <ScrollView style={styles.tabContent}>
                 <Text style={styles.tabTitle}>Compare</Text>
                 <Text>Comparison with other cars will be added here.</Text>
             </ScrollView>
         ),
-        variants: () => (
-            <ScrollView style={styles.tabContent}>
-                <Text style={styles.tabTitle}>Variants</Text>
-                <Text>Variants of the car will be added here.</Text>
-            </ScrollView>
-        ),
+        variants: () => {
+
+            return (
+                <View>
+                    <Text style={styles.tabTitle}>Variants</Text>
+                    <ScrollView style={styles.tabContent}>
+                        <SimilarCars data={similarCarsData} />
+                    </ScrollView>
+                </View>
+            )
+        },
         colours: () => (
             <View style={styles.tabContent}>
                 <View className="px-2 my-4">
@@ -718,7 +663,7 @@ const styles = StyleSheet.create({
     tabTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        marginBottom: 10,
+        // marginBottom: 10,
         padding: 20,
     },
     tabImage: {

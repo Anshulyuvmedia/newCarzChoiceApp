@@ -266,7 +266,7 @@ const carInsurance = () => {
     return (
         <SafeAreaView className="flex-1">
             {loading ? (
-                <ActivityIndicator size="large" color="#a62325" style={{ marginTop: 400 }} />
+                <ActivityIndicator size="large" color="#0061ff" style={{ marginTop: 400 }} />
             ) : (
                 <View className="px-5 flex-1">
                     <ScrollView showsVerticalScrollIndicator={false} >
@@ -410,7 +410,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     submitButton: {
-        backgroundColor: '#a62325',
+        backgroundColor: '#0061ff',
         padding: 15,
         borderRadius: 8,
         alignItems: 'center',

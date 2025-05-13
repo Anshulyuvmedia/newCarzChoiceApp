@@ -101,7 +101,7 @@ const ExploreDealers = () => {
             </View>
 
             {loading ? (
-                <ActivityIndicator size="large" color="#a62325" style={{ marginTop: 300 }} />
+                <ActivityIndicator size="large" color="#0061ff" style={{ marginTop: 300 }} />
             ) : (
                 <FlatList
                     data={visibleCars}

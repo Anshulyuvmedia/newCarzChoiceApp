@@ -56,21 +56,30 @@ const BrandList = () => {
                         width: itemWidth,
                         marginRight: ITEM_MARGIN,
                         marginBottom: ITEM_MARGIN,
+                        backgroundColor: '#fff',
+                        borderColor: '#eee',
+                        borderWidth: 1,
+                        borderRadius: 10,
+                        alignItems: 'center',
+                        paddingVertical: 10,
+                        shadowColor: "#000",
+                        shadowOffset: { width: 0, height: 1 },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 2,
+                        elevation: 2,
                     }}
                     className={`flex flex-col items-center rounded-xl p-2 border border-gray-300 }`}
                 >
                     {item.iconimage ? (
                         <Image
-                            style={[styles.brandImg, { width: 65, height: 50 }]}
+                            style={styles.brandImg}
                             source={{ uri: `https://carzchoice.com/assets/backend-assets/images/${item.iconimage}` }}
                             onError={(e) => console.error(`Error loading image for ${item.label}:`, e.nativeEvent.error)}
                         />
                     ) : (
                         <Text>No Image</Text>
                     )}
-                    <Text
-                        className={`text-xs text-center font-rubik-bold mt-1 }`}
-                    >
+                    <Text style={{ fontSize: 12, marginTop: 6, fontWeight: '600', textAlign: 'center' }}>
                         {item.label}
                     </Text>
                 </TouchableOpacity>
@@ -97,8 +106,8 @@ export default BrandList;
 
 const styles = StyleSheet.create({
     brandImg: {
-        width: 60,
-        height: 60,
+        width: 50,
+        height: 50,
         resizeMode: "contain",
     },
 });

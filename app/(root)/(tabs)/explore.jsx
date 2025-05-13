@@ -9,148 +9,170 @@ import { Card } from '@/components/Cards';
 import { LocationContext } from '@/components/LocationContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import Toast from 'react-native-toast-message';
 
 const Explore = () => {
-  const { currentCity } = useContext(LocationContext);
-  const [listingData, setListingData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(2);
-  const [loadingMore, setLoadingMore] = useState(false); // NEW
-  const params = useLocalSearchParams();
-  const [selectedFilters, setSelectedFilters] = useState({
-    city: currentCity,
-    budget: null,
-    fuelType: null,
-    transmission: null,
-    color: null,
-    brand: null,
-  });
-  const insets = useSafeAreaInsets();
-  const tabBarHeight = useBottomTabBarHeight();
+    const { currentCity } = useContext(LocationContext);
+    const [listingData, setListingData] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [visibleCount, setVisibleCount] = useState(2);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const params = useLocalSearchParams();
+    const [selectedFilters, setSelectedFilters] = useState({
+        budget: null,
+        fuelType: null,
+        transmission: null,
+        brand: null,
+        bodyType: null,
+    });
+    const insets = useSafeAreaInsets();
+    const tabBarHeight = useBottomTabBarHeight();
 
-  const handleCardPress = (id) => router.push(`/vehicles/${id}`);
+    const handleCardPress = (id) => router.push(`/vehicles/${id}`);
 
-  const loadMoreCars = () => {
-    if (loadingMore || visibleCount >= listingData.length) return;
-    setLoadingMore(true);
-    setTimeout(() => {
-      setVisibleCount((prev) => prev + 2);
-      setLoadingMore(false);
-    }, 300); // Optional: simulate network delay
-  };
-
-  const fetchFilterData = async () => {
-    setLoading(true);
-    setListingData([]);
-
-    let requestBody = {
-      attribute: {
-        brand: params.brand || null,
-        fuelType: params.fuelType || null,
-        transmission: params.transmission || null,
-        budget: params.budget || null,
-        color: params.color || null,
-      },
-      location: params.city || null,
+    const debounce = (func, wait) => {
+        let timeout;
+        return (...args) => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func(...args), wait);
+        };
     };
 
-    Object.keys(requestBody.attribute).forEach(
-      (key) => requestBody.attribute[key] === null && delete requestBody.attribute[key]
-    );
-    if (!requestBody.location) delete requestBody.location;
+    const loadMoreCars = debounce(() => {
+        if (loadingMore || visibleCount >= listingData.length) return;
+        setLoadingMore(true);
+        setTimeout(() => {
+            setVisibleCount((prev) => prev + 2);
+            setLoadingMore(false);
+        }, 300);
+    }, 500);
 
-    try {
-      const response = await axios.post("https://carzchoice.com/api/filterOldCarByAttribute", requestBody, {
-        headers: { "Content-Type": "application/json" },
-      });
-
-      if (response.data.variants) {
-        setListingData(response.data.variants);
-      } else {
+    const fetchFilterData = async () => {
+        setLoading(true);
         setListingData([]);
-      }
-    } catch (error) {
-      console.error("Error fetching listings:", error.response?.data || error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  useEffect(() => {
-    setSelectedFilters({
-      city: params.city || null,
-      budget: params.budget || null,
-      fuelType: params.fuelType || null,
-      transmission: params.transmission || null,
-      color: params.color || null,
-      brand: params.brand || null,
-    });
+        const requestBody = {
+            bodyType: selectedFilters.bodyType || null,
+            brand: selectedFilters.brand || null,
+            budget: selectedFilters.budget || null,
+            fuelType: selectedFilters.fuelType || null,
+            transmission: selectedFilters.transmission || null,
+            location: params.city || null,
+        };
+        Object.keys(requestBody).forEach(key => requestBody[key] === null && delete requestBody[key]);
 
-    setVisibleCount(2);
-    fetchFilterData();
-  }, [JSON.stringify(params)]);
+        try {
+            const response = await axios.post("https://carzchoice.com/api/filterByAttribute", requestBody, {
+                headers: { "Content-Type": "application/json" },
+            });
 
-  const visibleCars = listingData.slice(0, visibleCount);
+            if (response.data.success) {
+                const variants = Array.isArray(response.data.variants) ? response.data.variants : [];
+                const variantsWithUniqueIds = variants.map((item, index) => ({
+                    ...item,
+                    id: item.id ? `${item.id}-${index}` : `fallback-${index}-${item.carname || index}`,
+                }));
+                setListingData(variantsWithUniqueIds);
+            } else {
+                throw new Error(response.data.message || "Failed to fetch variants");
+            }
+        } catch (error) {
+            console.error("Error fetching listings:", error.response?.data || error.message);
+            setListingData([]);
+            Toast.show({
+                type: "error",
+                text1: "Error",
+                text2: "Failed to fetch vehicle listings. Please try again.",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  return (
-    <SafeAreaView className="bg-white  flex-1">
-      <View className="px-5">
-        <View className="flex flex-row items-center ml-2 mb-3 justify-between">
-          <TouchableOpacity onPress={() => router.navigate('/')} className="flex flex-row bg-primary-200 rounded-full size-11 items-center justify-center">
-            <Image source={icons.backArrow} className="size-5" />
-          </TouchableOpacity>
-          <Text className="text-base mr-2 text-center font-rubik-medium text-black-300">
-            Search for Your Dream Car
-          </Text>
-          <TouchableOpacity onPress={() => router.push('/notifications')}>
-            <Image source={icons.bell} className="size-6" />
-          </TouchableOpacity>
-        </View>
+    useEffect(() => {
+        setSelectedFilters({
+            budget: params.budget || null,
+            fuelType: params.fuelType || null,
+            transmission: params.transmission || null,
+            brand: params.brand || null,
+            bodyType: params.bodyType || null,
+        });
+        setVisibleCount(2);
+        fetchFilterData();
+    }, [JSON.stringify(params)]);
 
-        <View className="min-h-[60px]">
-          <Search selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters} />
-        </View>
+    const visibleCars = Array.isArray(listingData) ? listingData.slice(0, visibleCount) : [];
 
-        <View className="mt-3">
-          <Text className="text-xl font-rubik-bold text-black-300 capitalize">
-            {listingData.length > 0
-              ? `${listingData.length} cars found in ${currentCity}`
-              : ' '}
-          </Text>
-        </View>
-      </View>
+    return (
+        <SafeAreaView className="bg-white flex-1">
+            <View className="px-5">
+                <View className="flex flex-row items-center ml-2 mb-3 justify-between">
+                    <TouchableOpacity onPress={() => router.navigate('/')} className="flex flex-row bg-primary-200 rounded-full size-11 items-center justify-center">
+                        <Image source={icons.backArrow} className="size-5" />
+                    </TouchableOpacity>
+                    <Text className="text-base mr-2 text-center font-rubik-medium text-black-300">
+                        Search for Your Dream Car
+                    </Text>
+                    <TouchableOpacity onPress={() => router.push('/notifications')}>
+                        <Image source={icons.bell} className="size-6" />
+                    </TouchableOpacity>
+                </View>
 
-      {loading ? (
-        <ActivityIndicator size="large" color="#a62325" style={{ marginTop: 300 }} />
-      ) : (
-        <FlatList
-          data={visibleCars}
-          renderItem={({ item }) => (
-            <Card item={item} onPress={() => handleCardPress(item.id)} />
-          )}
-          keyExtractor={(item) => item.id?.toString()}
-          numColumns={2}
-          ListEmptyComponent={
-            <View className="flex-1 justify-center items-center">
-              <Text className="text-center text-red-700 mt-10 font-rubik-bold">Sorry No Vehicle Found...</Text>
-              <Text className="text-center text-black-300 mt-10 font-rubik-bold">But you can sell your vehicle now!</Text>
-              <TouchableOpacity onPress={() => router.push('/sellvehicle')} className="mt-4 rounded-full bg-primary-300  px-6 py-2">
-                <Text className="text-center text-white">Sell Your Car Now</Text>
-              </TouchableOpacity>
+                <View className="min-h-[60px]">
+                    {selectedFilters && (
+                        <Search selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters} />
+                    )}
+                </View>
+
+                <View className="mt-3">
+                    <Text className="text-xl font-rubik-bold text-black-300 capitalize">
+                        {listingData.length > 0
+                            ? `${listingData.length} cars found in ${currentCity || 'your area'}`
+                            : ' '}
+                    </Text>
+                </View>
             </View>
-          }
-          contentContainerStyle={{
-            paddingBottom: insets.bottom + tabBarHeight + 80,
-            paddingTop: 10,
-          }}
-          columnWrapperStyle={{ flex: 1, gap: 5, paddingHorizontal: 5 }}
-          showsVerticalScrollIndicator={false}
-          onEndReached={loadMoreCars} // ✅ triggers load more
-          onEndReachedThreshold={0.5}   // ✅ triggers earlier
-        />
-      )}
-    </SafeAreaView>
-  );
+
+            {loading ? (
+                <ActivityIndicator size="large" color="#0061ff" style={{ marginTop: 300 }} />
+            ) : (
+                <FlatList
+                    data={visibleCars}
+                    renderItem={({ item }) => (
+                        <Card item={item} onPress={() => handleCardPress(item.id)} />
+                    )}
+                    keyExtractor={(item) => item.id.toString()}
+                    numColumns={2}
+                    extraData={selectedFilters}
+                    ListEmptyComponent={
+                        <View className="flex-1 justify-center items-center mt-10">
+                            <Text className="text-center text-red-700 font-rubik-bold text-lg">
+                                {listingData.length === 0 && !Object.values(params).some(val => val)
+                                    ? "Select Filters to Start"
+                                    : "No Vehicles Found"}
+                            </Text>
+                            <Text className="text-center text-black-300 mt-2 font-rubik-regular">
+                                {listingData.length === 0 && !Object.values(params).some(val => val)
+                                    ? "Choose filters to find your dream car!"
+                                    : "Try adjusting your filters."}
+                            </Text>
+                        </View>
+                    }
+                    ListFooterComponent={
+                        loadingMore && <ActivityIndicator size="small" color="#0061ff" style={{ marginVertical: 10 }} />
+                    }
+                    contentContainerStyle={{
+                        paddingBottom: insets.bottom + tabBarHeight + 80,
+                        paddingTop: 10,
+                    }}
+                    columnWrapperStyle={{ flex: 1, gap: 5, paddingHorizontal: 5 }}
+                    showsVerticalScrollIndicator={false}
+                    onEndReached={loadMoreCars}
+                    onEndReachedThreshold={0.5}
+                />
+            )}
+        </SafeAreaView>
+    );
 };
 
 export default Explore;

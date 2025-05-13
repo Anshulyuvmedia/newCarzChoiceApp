@@ -90,7 +90,7 @@ const MyVehicles = () => {
       <View className="mt-6 mb-12">
         {loading ? (
           <View>
-            <ActivityIndicator size="large" color="#a62325" style={{ marginTop: 300 }} />
+            <ActivityIndicator size="large" color="#0061ff" style={{ marginTop: 300 }} />
             <Text className="text-center text-gray-500 mt-10">Loading car...</Text>
           </View>
         ) : userPropertyData.length === 0 ? (
