@@ -15,7 +15,7 @@ import Toast, { BaseToast } from 'react-native-toast-message';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import Carcolorgallery from "../../../components/carcolorgallery";
 import CarImageGallery from "../../../components/CarImageGallery";
-import SimilarCars from "../../../components/SimilarCars";
+import VariantsList from "../../../components/VariantsList";
 
 const { width } = Dimensions.get("window");
 
@@ -140,7 +140,7 @@ const CarDetails = () => {
                 let apiData = response.data.data.cardetails;
                 let parsedSpecifications = [];
                 let parsedFeatures = [];
-                // console.log('similarcars variants', response.data.data.similarcars);
+                // console.log(' variants', response.data.data.cardetails.variants);
                 try {
                     if (Array.isArray(apiData.specifications) && apiData.specifications.length > 0) {
                         let parsedSpecData = JSON.parse(apiData.specifications[0]);
@@ -191,7 +191,7 @@ const CarDetails = () => {
                 setCarData(apiData);
                 setSpecifications(parsedSpecifications);
                 setFeatures(parsedFeatures);
-                setSimilarCarsData(response.data.data.similarcars);
+                setSimilarCarsData(response.data.data.cardetails.variants);
 
             } else {
                 throw new Error("Car details not found in response.");
@@ -325,25 +325,6 @@ const CarDetails = () => {
         }
     ];
 
-    const renderImageItem = ({ item }) => {
-        // console.log("Image item:", item);
-        return (
-            <View>
-                <Image
-                    source={{ uri: item }}
-                    style={styles.tabImage}
-                />
-                <Text>{item.colorname}</Text>
-            </View>
-        )
-    };
-
-    const getImageItemLayout = (data, index) => ({
-        length: 220,
-        offset: 220 * index,
-        index,
-    });
-
     const renderScene = useMemo(() => SceneMap({
         overview: () => (
             <ScrollView style={styles.tabContent}>
@@ -443,13 +424,12 @@ const CarDetails = () => {
             </ScrollView>
         ),
         variants: () => {
-
             return (
-                <View>
-                    <Text style={styles.tabTitle}>Variants</Text>
-                    <ScrollView style={styles.tabContent}>
-                        <SimilarCars data={similarCarsData} />
-                    </ScrollView>
+                <View className="flex-1">
+                    <VariantsList
+                        data={similarCarsData}
+                        headerTitle={`${CarData.brandname} ${CarData.carname} variants price list`}
+                    />
                 </View>
             )
         },
@@ -657,7 +637,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     tabContent: {
-        backgroundColor: '#f8f8f8',
+        // backgroundColor: '#f8f8f8',
         flexGrow: 1,
     },
     tabTitle: {
