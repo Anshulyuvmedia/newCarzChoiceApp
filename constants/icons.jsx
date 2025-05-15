@@ -61,11 +61,21 @@ import signing from "@/assets/icons/signing.png";
 import clipboard from "@/assets/icons/clipboard.png";
 import questioning from "@/assets/icons/questioning.png";
 import customersupport from "@/assets/icons/customersupport.png";
+import bubblechat from "@/assets/icons/bubblechat.png";
+import pricing from "@/assets/icons/pricing.png";
+import bestprice from "@/assets/icons/bestprice.png";
+import idea from "@/assets/icons/idea.png";
+import hidden from "@/assets/icons/hidden.png";
 
 export default {
   engineDisplacement,
   fuel,
+  hidden,
+  idea,
+  pricing,
+  bestprice,
   gear,
+  bubblechat,
   downarrow,
   signing,
   clipboard,
