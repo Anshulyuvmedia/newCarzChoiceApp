@@ -293,7 +293,7 @@ const CompareScreen = () => {
                                 <Image
                                     source={{ uri: variant1Data.image }}
                                     style={styles.carImage}
-                                    resizeMode="contain"
+                                    resizeMode="cover"
                                 />
                             ) : (
                                 <View style={[styles.carImage, styles.placeholderImage]}>
@@ -322,7 +322,7 @@ const CompareScreen = () => {
                                 <Image
                                     source={{ uri: variant2Data.image }}
                                     style={styles.carImage}
-                                    resizeMode="contain"
+                                    resizeMode="cover"
                                 />
                             ) : (
                                 <View style={[styles.carImage, styles.placeholderImage]}>
@@ -378,8 +378,8 @@ const CompareScreen = () => {
 
                 {/* Specifications Section */}
                 <Text style={styles.sectionTitle}>Specifications</Text>
-                {allSpecTypes.map((type, index) => (
-                    <View key={['index']['row']} style={styles.sectionCard}>
+                {allSpecTypes.map((type) => (
+                    <View key={type} style={styles.sectionCard}>
                         <TouchableOpacity
                             style={styles.sectionHeader}
                             onPress={() => toggleSpecSubSection(type)}
@@ -394,7 +394,7 @@ const CompareScreen = () => {
                         </TouchableOpacity>
                         {specSubSections[type] && (
                             <View style={styles.sectionContent}>
-                                {(variant1Data.specifications[type] || variant2Data.specifications[type] || []).map((spec, specIndex) => {
+                                {(variant1Data.specifications[type] || variant2Data.specifications[type] || []).map((spec) => {
                                     const variant1Value = (variant1Data.specifications[type] || []).find(s => s.label === spec.label)?.value || 'N/A';
                                     const variant2Value = (variant2Data.specifications[type] || []).find(s => s.label === spec.label)?.value || 'N/A';
                                     const isSame = variant1Value === variant2Value;
@@ -405,11 +405,12 @@ const CompareScreen = () => {
 
                                     return (
                                         <View
+                                            key={spec.label}
                                             className="flex border-b border-gray-100 pt-3"
                                             style={[highlightDifferences && !isSame && styles.highlightedRow]}
                                         >
                                             <Text style={styles.specLabel}>{spec.label}</Text>
-                                            <View key={specIndex} style={styles.specRow}>
+                                            <View key={`${spec.label}-values`} style={styles.specRow}>
                                                 <Text style={styles.specValue1}>{variant1Value}</Text>
                                                 <Text style={styles.specValue2}>{variant2Value}</Text>
                                             </View>
@@ -423,8 +424,8 @@ const CompareScreen = () => {
 
                 {/* Features Section */}
                 <Text style={styles.sectionTitle}>Features</Text>
-                {allFeatureTypes.map((type, index) => (
-                    <View key={index} style={styles.sectionCard}>
+                {allFeatureTypes.map((type) => (
+                    <View key={type} style={styles.sectionCard}>
                         <TouchableOpacity
                             style={styles.sectionHeader}
                             onPress={() => toggleFeatureSection(type)}
@@ -439,7 +440,7 @@ const CompareScreen = () => {
                         </TouchableOpacity>
                         {sections.features[type] && (
                             <View style={styles.sectionContent}>
-                                {featureComparison[type].map((feature, fIndex) => {
+                                {featureComparison[type].map((feature) => {
                                     const isSame = feature.variant1Has === feature.variant2Has;
 
                                     if (hideSimilar && isSame) {
@@ -448,11 +449,12 @@ const CompareScreen = () => {
 
                                     return (
                                         <View
+                                            key={feature.label}
                                             className="flex border-b border-gray-100 pt-3"
                                             style={[highlightDifferences && !isSame && styles.highlightedRow]}
                                         >
                                             <Text style={styles.featureLabel}>{feature.label}</Text>
-                                            <View key={fIndex} style={styles.featureRow}>
+                                            <View key={`${feature.label}-values`} style={styles.featureRow}>
                                                 <View style={styles.featureColumn1}>
                                                     <Feather
                                                         name={feature.variant1Has ? 'check-circle' : 'x-circle'}
@@ -528,7 +530,7 @@ const styles = StyleSheet.create({
         }),
     },
     headerTitle: {
-        fontSize: 24,
+        fontSize: 18,
         fontWeight: '700',
         color: '#1F2937', // text-gray-800
     },
@@ -539,7 +541,7 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         paddingHorizontal: 12,
-        paddingVertical: 32,
+        paddingVertical: 15,
         paddingBottom: 48,
     },
     overviewCard: {
@@ -562,7 +564,7 @@ const styles = StyleSheet.create({
     comparisonRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
+        alignItems: 'start',
         marginBottom: 24,
     },
     variantCard: {
@@ -573,7 +575,9 @@ const styles = StyleSheet.create({
     carImage: {
         width: '100%',
         height: 128,
-        borderRadius: 8,
+        borderRadius: 15,
+        borderWidth: 1,
+        borderColor: "lightgray",
         marginBottom: 2,
     },
     placeholderImage: {
@@ -601,6 +605,7 @@ const styles = StyleSheet.create({
         height: 35,
         borderRadius: 24,
         backgroundColor: '#2563EB', // bg-blue-600
+        marginTop: 50,
     },
     vsText: {
         fontSize: 16,
@@ -692,7 +697,7 @@ const styles = StyleSheet.create({
     specValue2: {
         flex: 1,
         fontSize: 14,
-        color: '#1F2937', // text-gray-@k800
+        color: '#1F2937', // text-gray-800
         fontWeight: '700',
         textAlign: 'right',
     },
@@ -728,7 +733,7 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         backgroundColor: 'white',
-        borderColor: 'gray',
+        borderColor: 'lightgray',
         borderWidth: 1,
         paddingVertical: 5,
         paddingHorizontal: 15,
@@ -757,7 +762,8 @@ const styles = StyleSheet.create({
         borderColor: '#2563EB',
     },
     highlightedRow: {
-        backgroundColor: '#FEF3C7', // bg-yellow-100
+        backgroundColor: '#e8ffe6', // bg-yellow-100
+        
     },
     loadingContainer: {
         flex: 1,

@@ -66,10 +66,26 @@ import pricing from "@/assets/icons/pricing.png";
 import bestprice from "@/assets/icons/bestprice.png";
 import idea from "@/assets/icons/idea.png";
 import hidden from "@/assets/icons/hidden.png";
+import shareCar from "@/assets/icons/shareCar.png";
+import oil from "@/assets/icons/gas.png";
+import fast from "@/assets/icons/fast.png";
+import seat from "@/assets/icons/seat.png";
+import chassis from "@/assets/icons/chassis.png";
+import gearshift from "@/assets/icons/gearshift.png";
+import piston from "@/assets/icons/piston.png";
+import bluerightarrow from "@/assets/icons/bluerightarrow.png";
 
 export default {
   engineDisplacement,
   fuel,
+  bluerightarrow,
+  fast,
+  gearshift,
+  chassis,
+  piston,
+  seat,
+  oil,
+  shareCar,
   hidden,
   idea,
   pricing,

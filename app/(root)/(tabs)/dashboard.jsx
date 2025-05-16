@@ -87,25 +87,6 @@ const Dashboard = () => {
   }, []);
 
 
-  const handleLogout = async () => {
-    try {
-      await AsyncStorage.clear();
-      Toast.show({
-        type: 'success',
-        text1: 'Logged Out',
-        text2: 'You have been logged out successfully.',
-        position: 'bottom',  // Optional: top, bottom, or center
-        visibilityTime: 4000, // Duration in ms
-        autoHide: true,
-      });
-
-      setTimeout(() => {
-        router.push('/signin'); // Ensure redirection happens after showing the toast
-      }, 1000);
-    } catch (error) {
-      console.error('Error during logout:', error);
-    }
-  };
 
   return (
     <SafeAreaView>
@@ -177,17 +158,6 @@ const Dashboard = () => {
 
             <View className="flex flex-col mt-5 border-t pt-5 border-primary-200">
 
-              {userData && userData.usertype == 'User' && (
-                <TouchableOpacity onPress={() => router.push('/dashboard/registerdealer')} className="flex flex-row items-center py-2 border border-gray-300 mb-2 rounded-2xl ps-4 bg-white">
-                  <Image source={icons.person} className="size-6" />
-                  <View>
-                    <Text className="text-lg font-rubik-medium text-primary-300 ml-3">Become A Dealer</Text>
-                    <Text className="text-sm font-rubik text-gray-700 ml-3">Sell Car of Multiple Brands</Text>
-                  </View>
-
-                </TouchableOpacity>
-              )}
-
               <TouchableOpacity onPress={() => router.push('./allnews')} className="flex flex-row items-center py-2 border border-gray-300 mb-2 rounded-2xl ps-4 bg-white">
                 <Image source={icons.customersupport} className="size-8 backgroundColor: blue" />
                 <View>
@@ -212,13 +182,6 @@ const Dashboard = () => {
               </TouchableOpacity>
             </View>
 
-            <View className="flex flex-col mt-5 border-t pt-5 border-primary-200">
-              <TouchableOpacity onPress={handleLogout} className="flex flex-row items-center py-2 border border-red-300 mb-2 rounded-2xl ps-4 bg-white">
-                <Image source={icons.logout} className="size-6" />
-                <Text className="text-lg font-rubik-medium text-danger ml-3">Logout</Text>
-              </TouchableOpacity>
-
-            </View>
           </View>
         )}
       </ScrollView>

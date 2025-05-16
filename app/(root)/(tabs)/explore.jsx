@@ -19,11 +19,11 @@ const Explore = () => {
     const [loadingMore, setLoadingMore] = useState(false);
     const params = useLocalSearchParams();
     const [selectedFilters, setSelectedFilters] = useState({
-        budget: null,
-        fuelType: null,
-        transmission: null,
-        brand: null,
-        bodyType: null,
+        budget: params.budget || null,
+        fuelType: params.fuelType || null,
+        transmission: params.transmission || null,
+        brand: params.brand || null,
+        bodyType: params.bodyType || null,
     });
     const insets = useSafeAreaInsets();
     const tabBarHeight = useBottomTabBarHeight();
@@ -57,7 +57,7 @@ const Explore = () => {
             budget: selectedFilters.budget || null,
             fuelType: selectedFilters.fuelType || null,
             transmission: selectedFilters.transmission || null,
-            location: params.city || null,
+            location: params.city || currentCity || null,
         };
         Object.keys(requestBody).forEach(key => requestBody[key] === null && delete requestBody[key]);
 
@@ -90,16 +90,8 @@ const Explore = () => {
     };
 
     useEffect(() => {
-        setSelectedFilters({
-            budget: params.budget || null,
-            fuelType: params.fuelType || null,
-            transmission: params.transmission || null,
-            brand: params.brand || null,
-            bodyType: params.bodyType || null,
-        });
-        setVisibleCount(2);
         fetchFilterData();
-    }, [JSON.stringify(params)]);
+    }, [JSON.stringify(selectedFilters)]);
 
     const visibleCars = Array.isArray(listingData) ? listingData.slice(0, visibleCount) : [];
 
@@ -119,9 +111,7 @@ const Explore = () => {
                 </View>
 
                 <View className="min-h-[60px]">
-                    {selectedFilters && (
-                        <Search selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters} />
-                    )}
+                    <Search selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters} />
                 </View>
 
                 <View className="mt-3">
@@ -147,12 +137,12 @@ const Explore = () => {
                     ListEmptyComponent={
                         <View className="flex-1 justify-center items-center mt-10">
                             <Text className="text-center text-red-700 font-rubik-bold text-lg">
-                                {listingData.length === 0 && !Object.values(params).some(val => val)
+                                {listingData.length === 0 && !Object.values(selectedFilters).some(val => val)
                                     ? "Select Filters to Start"
                                     : "No Vehicles Found"}
                             </Text>
                             <Text className="text-center text-black-300 mt-2 font-rubik-regular">
-                                {listingData.length === 0 && !Object.values(params).some(val => val)
+                                {listingData.length === 0 && !Object.values(selectedFilters).some(val => val)
                                     ? "Choose filters to find your dream car!"
                                     : "Try adjusting your filters."}
                             </Text>

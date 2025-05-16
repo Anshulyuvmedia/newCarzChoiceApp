@@ -86,10 +86,10 @@ const ExploreDealers = () => {
                         <Image source={icons.bell} className="size-6" />
                     </TouchableOpacity>
                 </View>
-
+{/* 
                 <View className="min-h-[60px]">
                     <Search selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters} />
-                </View>
+                </View> */}
 
                 <View className="mt-3">
                     <Text className="text-xl font-rubik-bold text-black-300 capitalize">

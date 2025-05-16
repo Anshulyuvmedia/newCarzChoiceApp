@@ -16,6 +16,9 @@ import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import Carcolorgallery from "../../../components/carcolorgallery";
 import CarImageGallery from "../../../components/CarImageGallery";
 import VariantsList from "../../../components/VariantsList";
+import ProsAndCons from "../../../components/ProsAndCons";
+import CarFaq from "../../../components/CarFaq";
+import CompareOtherCars from "../../../components/CompareOtherCars";
 
 const { width } = Dimensions.get("window");
 
@@ -32,6 +35,9 @@ const CarDetails = () => {
     const [specifications, setSpecifications] = useState([]);
     const [similarCarsData, setSimilarCarsData] = useState([]);
     const [features, setFeatures] = useState([]);
+    const [prosConsData, setProsConsData] = useState([]);
+    const [faqData, setFaqData] = useState([]);
+    const [otherCardata, setOtherCardata] = useState([]);
     const router = useRouter();
 
     const toastConfig = {
@@ -96,39 +102,56 @@ const CarDetails = () => {
                 return;
             }
             const parsedUserData = JSON.parse(storedData);
-            const carImage = CarGallery?.length > 0 ? CarGallery[0] : null;
-
+            console.log('user data', parsedUserData);
+            // Prepare enquiry data with fallbacks
             const enquiryData = {
                 fullname: parsedUserData.fullname || "Unknown",
                 userid: parsedUserData.id,
                 carid: CarId,
-                mobile: parsedUserData.contactno,
-                email: parsedUserData.email,
-                vehiclename: `${CarData?.manufactureyear} ${CarData?.brandname} ${CarData?.carname} ${CarData?.modalname}`,
-                city: parsedUserData.district,
-                statename: CarData?.state,
+                mobile: parsedUserData.contactno || "",
+                email: parsedUserData.email || "",
+                vehiclename: `${CarData?.manufactureyear || ''} ${CarData?.brandname || ''} ${CarData?.carname || ''} ${CarData?.modalname || ''}`.trim() || "Unknown Vehicle",
+                city: parsedUserData.district || "",
+                statename: parsedUserData?.state || "",
                 leadstatus: 'interested',
-                remarks: `Interested in ${CarData?.manufactureyear} ${CarData?.brandname} ${CarData?.carname} ${CarData?.modalname}`,
+                remarks: `Interested in ${CarData?.manufactureyear || ''} ${CarData?.brandname || ''} ${CarData?.carname || ''} ${CarData?.modalname || ''}`.trim() || "Interested in a vehicle",
             };
 
-            const response = await axios.post('https://carzchoice.com/api/submit-enquiry', enquiryData);
+            // Client-side validation
+            const errors = [];
+            if (!enquiryData.mobile) errors.push("Mobile number is required");
+            if (!enquiryData.email) errors.push("Email is required");
+            else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(enquiryData.email)) errors.push("Email is invalid");
+            if (!enquiryData.city) errors.push("City is required");
+            if (!enquiryData.vehiclename) errors.push("Vehicle name is required");
+            if (!enquiryData.statename) errors.push("State is required");
+
+            if (errors.length > 0) {
+                Toast.show({ type: 'error', text1: 'Validation Error', text2: errors.join('. ') });
+                return;
+            }
+
+            console.log('Submitting enquiry with data:', enquiryData);
+            const response = await axios.post('https://carzchoice.com/api/bookvehiclenow', enquiryData);
             if (response.data?.success) {
                 Toast.show({ type: 'success', text1: 'Success', text2: 'Enquiry submitted successfully!' });
-                router.push({ pathname: "/chat" });
             } else {
                 throw new Error(response.data?.message || 'Failed to submit enquiry.');
             }
         } catch (error) {
-            console.error("Error submitting enquiry or starting chat:", error);
-            Toast.show({ type: 'error', text1: 'Error', text2: error.message || 'An error occurred. Please try again.' });
+            console.error("Error submitting enquiry ", error);
+            if (error.response?.status === 422) {
+                const validationErrors = error.response.data.errors;
+                const errorMessage = Object.values(validationErrors).flat().join(' ');
+                Toast.show({ type: 'error', text1: 'Validation Error', text2: errorMessage || 'Please check your input.' });
+            } else {
+                Toast.show({ type: 'error', text1: 'Error', text2: error.message || 'An error occurred. Please try again.' });
+            }
         } finally {
             setLoading(false);
         }
     };
 
-    const handleChatPress = () => {
-        router.push({ pathname: "/chat" });
-    };
 
     const fetchCarData = async () => {
         setLoading(true);
@@ -140,7 +163,9 @@ const CarDetails = () => {
                 let apiData = response.data.data.cardetails;
                 let parsedSpecifications = [];
                 let parsedFeatures = [];
-                // console.log(' variants', response.data.data.cardetails.variants);
+
+                // console.log('apidata', response.data.data.variantsfaqs);
+
                 try {
                     if (Array.isArray(apiData.specifications) && apiData.specifications.length > 0) {
                         let parsedSpecData = JSON.parse(apiData.specifications[0]);
@@ -192,6 +217,12 @@ const CarDetails = () => {
                 setSpecifications(parsedSpecifications);
                 setFeatures(parsedFeatures);
                 setSimilarCarsData(response.data.data.cardetails.variants);
+                setProsConsData({
+                    pros: response.data.data.pros,
+                    cons: response.data.data.cons
+                });
+                setFaqData(response.data.data.variantsfaqs);
+                setOtherCardata(response.data.data.similarcars);
 
             } else {
                 throw new Error("Car details not found in response.");
@@ -213,18 +244,19 @@ const CarDetails = () => {
     };
 
     const [routes] = useState([
-        { key: 'overview', title: 'Overview' },
-        { key: 'price', title: 'Price' },
-        { key: 'compare', title: 'Compare' },
-        { key: 'variants', title: 'Variants' },
-        { key: 'colours', title: 'Colours' },
-        { key: 'specs', title: 'Specs & Features' },
-        { key: 'images', title: 'Images' },
-        { key: 'pros', title: 'Pros & Cons' },
+        { key: 'overview', title: 'OVERVIEW' },
+        { key: 'variants', title: 'VARIANTS' },
+        { key: 'colours', title: 'COLOURS' },
+        { key: 'images', title: 'IMAGES' },
+        { key: 'specs', title: 'FEATURES & SPECS.' },
+        { key: 'compare', title: 'COMPARE' },
+        { key: 'emi', title: 'EMI' },
+        { key: 'pros', title: 'PROS & CONS' },
         { key: 'faq', title: 'FAQ' },
     ]);
     const [index, setIndex] = useState(0);
-
+    // Find the index of the 'specs' tab
+    const specsTabIndex = routes.findIndex(route => route.key === 'specs');
     const renderTabBar = props => (
         <TabBar
             {...props}
@@ -249,7 +281,7 @@ const CarDetails = () => {
     const carDetails = [
         {
             key: 'Fuel Type',
-            icon: icons.fuel,
+            icon: icons.oil,
             value: (() => {
                 try {
                     const fuelData = JSON.parse(CarData?.fueltype || '""');
@@ -261,7 +293,7 @@ const CarDetails = () => {
         },
         {
             key: 'Mileage',
-            icon: icons.seats,
+            icon: icons.fast,
             value: (() => {
                 try {
                     const mileageData = JSON.parse(CarData?.mileage || '{}');
@@ -273,12 +305,12 @@ const CarDetails = () => {
                 }
             })()
         },
-        { key: 'Seats', icon: icons.seats, value: CarData?.seatingcapacity || '-' },
-        { key: 'Body Type', icon: icons.seats, value: CarData?.bodytype || '-' },
-        { key: 'Engine', icon: icons.engineDisplacement, value: CarData?.engine || '-' },
+        { key: 'Seats', icon: icons.seat, value: CarData?.seatingcapacity || '-' },
+        { key: 'Body Type', icon: icons.chassis, value: CarData?.bodytype || '-' },
+        { key: 'Engine', icon: icons.piston, value: CarData?.engine || '-' },
         {
             key: 'Transmission',
-            icon: icons.transmission,
+            icon: icons.gearshift,
             value: (() => {
                 try {
                     const transmissionData = JSON.parse(CarData?.transmission || '""');
@@ -288,41 +320,6 @@ const CarDetails = () => {
                 }
             })()
         },
-    ];
-
-    const carMeta = [
-        {
-            id: 'fuel',
-            icon: icons.fuel2,
-            text: (() => {
-                try {
-                    const fuelData = JSON.parse(CarData?.fueltype || '""');
-                    return Array.isArray(fuelData) ? fuelData.map(fuel => fuel.charAt(0).toUpperCase() + fuel.slice(1)).join(', ') : fuelData;
-                } catch {
-                    return CarData?.fueltype || '-';
-                }
-            })(),
-            capitalize: CarData?.fueltype === 'CNG' ? 'uppercase' : 'capitalize'
-        },
-        {
-            id: 'transmission',
-            icon: icons.transmission2,
-            text: (() => {
-                try {
-                    const transmissionData = JSON.parse(CarData?.transmission || '""');
-                    return Array.isArray(transmissionData) ? transmissionData.map(trans => trans.charAt(0).toUpperCase() + trans.slice(1)).join(', ') : transmissionData;
-                } catch {
-                    return CarData?.transmission || '-';
-                }
-            })(),
-            capitalize: 'capitalize'
-        },
-        {
-            id: 'bodytype',
-            icon: icons.kms,
-            text: `${CarData?.bodytype || '-'}`,
-            capitalize: ''
-        }
     ];
 
     const renderScene = useMemo(() => SceneMap({
@@ -336,8 +333,8 @@ const CarDetails = () => {
                             <View className="relative w-full">
                                 {CarGallery.length > 0 ? (
                                     <>
-                                        <TouchableOpacity style={styles.arrowLeft} onPress={() => carouselRef.current?.prev()}>
-                                            <AntDesign name="left" size={24} color="white" />
+                                        <TouchableOpacity style={styles.arrowLeft} onPress={() => carouselRef.current?.prev()} className="bg-white p-2 rounded-full">
+                                            <AntDesign name="left" size={24} color="black" />
                                         </TouchableOpacity>
                                         <Carousel
                                             ref={carouselRef}
@@ -350,8 +347,8 @@ const CarDetails = () => {
                                             scrollAnimationDuration={3000}
                                             renderItem={renderCarouselItem}
                                         />
-                                        <TouchableOpacity style={styles.arrowRight} onPress={() => carouselRef.current?.next()}>
-                                            <AntDesign name="right" size={24} color="white" />
+                                        <TouchableOpacity style={styles.arrowRight} onPress={() => carouselRef.current?.next()} className="bg-white p-2 rounded-full">
+                                            <AntDesign name="right" size={24} color="black" />
                                         </TouchableOpacity>
                                     </>
                                 ) : (
@@ -360,53 +357,54 @@ const CarDetails = () => {
                                     </View>
                                 )}
                             </View>
-                            <Text className="text-xl font-rubik-bold px-4 mt-3">
-                                {CarData.brandname} {CarData.carname}
-                            </Text>
-                            <View className="flex-row flex-wrap px-4 mt-3">
-                                {carMeta.map((item) => (
-                                    <View key={item.id} className="flex-row items-center mr-7 mb-2">
-                                        <View className="flex items-center justify-center bg-primary-100 rounded-full size-10">
-                                            <Image source={item.icon} className="size-4" />
-                                        </View>
-                                        <Text className={`text-black-300 text-sm font-rubik-medium ml-2 ${item.capitalize}`}>
-                                            {item.text}
-                                        </Text>
-                                    </View>
-                                ))}
-                            </View>
-                            <View className="flex-row border-t-1 mt-4 px-4">
-                                <Text className="text-black-300 text-base font-rubik-medium mb-1 me-3">Price</Text>
-                                <Text className="text-primary-300 text-base font-rubik-bold">
-                                    {new Intl.NumberFormat('en-IN', {
-                                        style: 'currency',
-                                        currency: 'INR',
-                                        maximumFractionDigits: 0,
-                                    }).format(CarData.price)}
+                            <View className="bg-white p-3 m-3 rounded-lg shadow-md">
+                                <Text className="text-xl font-rubik-bold px-4 mt-3 text-primary-300">
+                                    {CarData.brandname} {CarData.carname}
                                 </Text>
+                                <Text className="text-base font-rubik-bold px-4 mt-1">
+                                    ( {CarData.carmodalname} )
+                                </Text>
+
+                                <View className="flex-row border-t-1 mt-4 px-4">
+                                    <Text className="text-black-300 text-base font-rubik-medium mb-1 me-3">Price</Text>
+                                    <Text className="text-primary-300 text-base font-rubik-bold">
+                                        {new Intl.NumberFormat('en-IN', {
+                                            style: 'currency',
+                                            currency: 'INR',
+                                            maximumFractionDigits: 0,
+                                        }).format(CarData.price)}
+                                    </Text>
+                                </View>
                             </View>
+
                         </View>
-                        <View className="flex flex-wrap flex-row mt-4 px-4">
+                        <View className="flex flex-wrap flex-row item-center justify-start m-3 p-3 shadow-md bg-white rounded-lg">
                             {carDetails.map((item, index) => (
                                 <View
                                     key={item.key}
-                                    className="flex-row items-center mb-4 w-1/2"
+                                    className="flex-row items-center mb-4 w-1/2 py-3 px-2"
                                 >
-                                    <View className="bg-gray-200 rounded-full p-2 mr-3">
-                                        <Image source={item.icon} className="w-6 h-6" />
+                                    <View className="bg-gray-100 rounded-full p-2 mr-3">
+                                        <Image source={item.icon} className="size-7" />
                                     </View>
                                     <View className="flex-1">
-                                        <Text className="text-sm font-rubik-medium text-black">{item.key}:</Text>
-                                        <Text className="text-sm text-gray-900 font-rubik" numberOfLines={2}>{item.value}</Text>
+                                        <Text className="text-sm font-rubik text-gray-500">{item.key}:</Text>
+                                        <Text className="text-base text-black font-rubik-medium" numberOfLines={2}>{item.value}</Text>
                                     </View>
                                 </View>
                             ))}
+                            <TouchableOpacity className="flex flex-row px-3 align-center"
+                                onPress={() => setIndex(specsTabIndex)}
+                            >
+                                <Text className="font-rubik-bold text-primary-300">See more</Text>
+                                <Image source={icons.bluerightarrow} className="size-4 mt-1" />
+                            </TouchableOpacity>
                         </View>
                     </>
                 )}
             </ScrollView>
         ),
-        price: () => {
+        emi: () => {
 
             return (
                 <View>
@@ -418,10 +416,10 @@ const CarDetails = () => {
             )
         },
         compare: () => (
-            <ScrollView style={styles.tabContent}>
-                <Text style={styles.tabTitle}>Compare</Text>
-                <Text>Comparison with other cars will be added here.</Text>
-            </ScrollView>
+            <View style={styles.tabContent}>
+                {/* <Text style={styles.tabTitle}>Compare</Text> */}
+                <CompareOtherCars data={otherCardata} headerTitle={`Compare ${CarData.brandname} ${CarData.carname} with similar cars`} currentCar={`${CarData.brandname} ${CarData.carname}`} currentCarId={CarId} />
+            </View>
         ),
         variants: () => {
             return (
@@ -435,36 +433,39 @@ const CarDetails = () => {
         },
         colours: () => (
             <View style={styles.tabContent}>
-                <View className="px-2 my-4">
-                    <Text className="text-xl font-rubik-bold px-4 my-3">
-                        {CarData.brandname} {CarData.carname}
-                    </Text>
-                    <ScrollView className="">
-                        <Carcolorgallery id={CarId} />
-                    </ScrollView>
-                </View>
+                <Text className="text-xl font-rubik-bold px-4 my-3">
+                    {CarData.brandname} {CarData.carname}
+                </Text>
+                <ScrollView className="">
+                    <Carcolorgallery id={CarId} />
+                </ScrollView>
             </View>
         ),
         specs: () => (
-            <ScrollView style={styles.tabContent}>
-                <Text style={styles.tabTitle}>Specs & Features</Text>
-                {Array.isArray(features) && features.length > 0 ? (
-                    <View className="bg-white rounded-lg pb-5">
-                        <Text className="text-xl font-rubik-bold text-primary-300 m-5">Car Features</Text>
-                        <FeaturesAccordion features={features} />
-                    </View>
-                ) : (
-                    <Text>No features available.</Text>
-                )}
-                {Array.isArray(specifications) && specifications.length > 0 ? (
-                    <View className="bg-white rounded-lg pb-5 my-5">
-                        <Text className="text-xl font-rubik-bold text-primary-300 m-5">Car Specifications</Text>
-                        <SpecsAccordion specifications={specifications} />
-                    </View>
-                ) : (
-                    <Text>No specifications available.</Text>
-                )}
-            </ScrollView>
+            <View style={styles.tabContent}>
+                <Text className="text-xl font-rubik-bold px-4 my-3">
+                    Features & Specifications
+                </Text>
+                <ScrollView>
+
+                    {Array.isArray(features) && features.length > 0 ? (
+                        <View className="bg-white rounded-lg pb-5">
+                            <Text className="text-xl font-rubik-bold text-primary-300 m-5">Car Features</Text>
+                            <FeaturesAccordion features={features} />
+                        </View>
+                    ) : (
+                        <Text className="p-3">No features available.</Text>
+                    )}
+                    {Array.isArray(specifications) && specifications.length > 0 ? (
+                        <View className="bg-white rounded-lg pb-5 my-5">
+                            <Text className="text-xl font-rubik-bold text-primary-300 m-5">Car Specifications</Text>
+                            <SpecsAccordion specifications={specifications} />
+                        </View>
+                    ) : (
+                        <Text className="p-3">No specifications available.</Text>
+                    )}
+                </ScrollView>
+            </View>
         ),
         images: () => (
             <View style={styles.tabContent}>
@@ -475,15 +476,15 @@ const CarDetails = () => {
             </View>
         ),
         pros: () => (
-            <ScrollView style={styles.tabContent}>
-                <Text style={styles.tabTitle}>Pros & Cons</Text>
-                <Text>Pros and cons will be added here.</Text>
-            </ScrollView>
+            <View>
+                <ScrollView style={styles.tabContent}>
+                    <ProsAndCons data={prosConsData} headerTitle={` Pros & Cons of ${CarData.brandname} ${CarData.carname}`} />
+                </ScrollView>
+            </View>
         ),
         faq: () => (
             <ScrollView style={styles.tabContent}>
-                <Text style={styles.tabTitle}>FAQ</Text>
-                <Text>Frequently asked questions will be added here.</Text>
+                <CarFaq data={faqData} headerTitle={` FAQ of ${CarData.brandname} ${CarData.carname}`} />
             </ScrollView>
         ),
     }), [carDetails, CarGallery, features, specifications, CarData]);
@@ -548,7 +549,7 @@ const CarDetails = () => {
             <View style={styles.bottomButtonBar}>
                 <View className="flex flex-row justify-between gap-4">
                     <TouchableOpacity
-                        onPress={handleChatPress}
+                        onPress={shareCar}
                         className="flex-1 flex-row items-center justify-center bg-green-600 py-3 rounded-full shadow-sm"
                         disabled={loading}
                     >
@@ -556,8 +557,8 @@ const CarDetails = () => {
                             <ActivityIndicator size="small" color="#fff" />
                         ) : (
                             <>
-                                <Image source={icons.bubblechat} className="w-5 h-5 mr-2" />
-                                <Text className="text-white text-lg font-rubik-bold">View Chat</Text>
+                                <Image source={icons.shareCar} className="w-5 h-5 mr-2" />
+                                <Text className="text-white text-lg font-rubik-bold">Share</Text>
                             </>
                         )}
                     </TouchableOpacity>

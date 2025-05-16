@@ -185,15 +185,6 @@ const Search = ({ selectedFilters = {}, setSelectedFilters }) => {
         );
     });
 
-    // Fallback for selectedFilters
-    const filters = selectedFilters || {
-        budget: null,
-        fuelType: null,
-        transmission: null,
-        brand: null,
-        bodyType: null,
-    };
-
     return (
         <View className="flex-1">
             {loading && (
@@ -214,11 +205,11 @@ const Search = ({ selectedFilters = {}, setSelectedFilters }) => {
                         <Image source={icons.search} className="w-6 h-6" />
                         <TextInput
                             value={[
-                                filters.budget,
-                                filters.transmission,
-                                filters.fuelType,
-                                filters.brand,
-                                filters.bodyType,
+                                selectedFilters.budget,
+                                selectedFilters.transmission,
+                                selectedFilters.fuelType,
+                                selectedFilters.brand,
+                                selectedFilters.bodyType,
                             ]
                                 .filter((val) => val)
                                 .join(", ")}
@@ -302,16 +293,16 @@ const Search = ({ selectedFilters = {}, setSelectedFilters }) => {
                             horizontal={true}
                             showsHorizontalScrollIndicator={false}
                             keyExtractor={(item) => `brand-${item.id}`}
-                            keyboardShouldPersistTaps="handled"
+                            keyboardShouldPersistT PSYCHOSOCIAL
                             style={{ marginTop: 10, marginStart: 10 }}
                             renderItem={({ item }) => (
                                 <FilterChip
                                     item={item}
-                                    isSelected={filters.brand === item.label}
+                                    isSelected={selectedFilters.brand === item.label}
                                     onPress={() =>
                                         setSelectedFilters(prev => ({
                                             ...prev,
-                                            brand: prev?.brand === item.label ? null : item.label,
+                                            brand: prev.brand === item.label ? null : item.label,
                                         }))
                                     }
                                     labelKey="label"
@@ -338,11 +329,11 @@ const Search = ({ selectedFilters = {}, setSelectedFilters }) => {
                             renderItem={({ item }) => (
                                 <FilterChip
                                     item={item}
-                                    isSelected={filters.budget === item.label}
+                                    isSelected={selectedFilters.budget === item.label}
                                     onPress={() =>
                                         setSelectedFilters(prev => ({
                                             ...prev,
-                                            budget: prev?.budget === item.label ? null : item.label,
+                                            budget: prev.budget === item.label ? null : item.label,
                                         }))
                                     }
                                     labelKey="label"
@@ -369,11 +360,11 @@ const Search = ({ selectedFilters = {}, setSelectedFilters }) => {
                             renderItem={({ item }) => (
                                 <FilterChip
                                     item={item}
-                                    isSelected={filters.transmission === item.label}
+                                    isSelected={selectedFilters.transmission === item.label}
                                     onPress={() =>
                                         setSelectedFilters(prev => ({
                                             ...prev,
-                                            transmission: prev?.transmission === item.label ? null : item.label,
+                                            transmission: prev.transmission === item.label ? null : item.label,
                                         }))
                                     }
                                     labelKey="value"
@@ -405,11 +396,11 @@ const Search = ({ selectedFilters = {}, setSelectedFilters }) => {
                             renderItem={({ item }) => (
                                 <FilterChip
                                     item={item}
-                                    isSelected={filters.fuelType === item.label}
+                                    isSelected={selectedFilters.fuelType === item.label}
                                     onPress={() =>
                                         setSelectedFilters(prev => ({
                                             ...prev,
-                                            fuelType: prev?.fuelType === item.label ? null : item.label,
+                                            fuelType: prev.fuelType === item.label ? null : item.label,
                                         }))
                                     }
                                     labelKey="label"
@@ -445,11 +436,11 @@ const Search = ({ selectedFilters = {}, setSelectedFilters }) => {
                             renderItem={({ item }) => (
                                 <FilterChip
                                     item={item}
-                                    isSelected={filters.bodyType === item.label}
+                                    isSelected={selectedFilters.bodyType === item.label}
                                     onPress={() =>
                                         setSelectedFilters(prev => ({
                                             ...prev,
-                                            bodyType: prev?.bodyType === item.label ? null : item.label,
+                                            bodyType: prev.bodyType === item.label ? null : item.label,
                                         }))
                                     }
                                     labelKey="label"
