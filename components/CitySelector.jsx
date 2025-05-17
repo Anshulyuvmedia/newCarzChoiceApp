@@ -34,8 +34,8 @@ const CitySelector = ({ cityData = [], onSelectCity }) => {
         setLoading(true);
         setTimeout(() => {
             setLoading(false);
-            selectorRef.current.open(); // trigger modal open
-        }, 300); // simulate delay
+            selectorRef.current.open();
+        }, 300);
     };
 
     return (
@@ -71,7 +71,7 @@ const CitySelector = ({ cityData = [], onSelectCity }) => {
                 animationType="slide"
                 optionTextStyle={{ color: 'black', textTransform: 'capitalize' }}
                 optionContainerStyle={{ backgroundColor: 'white' }}
-                customSelector={<></>} // prevent default UI
+                customSelector={<></>}
             />
         </View>
     );
@@ -84,7 +84,6 @@ const styles = StyleSheet.create({
         marginVertical: 5,
     },
     input: {
-        // backgroundColor: '#f0f0f0',
         paddingHorizontal: 10,
         height: 35,
         borderRadius: 5,
@@ -93,6 +92,6 @@ const styles = StyleSheet.create({
     textInput: {
         color: '#000',
         textTransform: 'capitalize',
-        fontWeight: 600,
+        fontWeight: '600',
     },
 });

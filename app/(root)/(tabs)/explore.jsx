@@ -1,4 +1,4 @@
-import { View, Text, Image, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, Image, TouchableOpacity, FlatList, ActivityIndicator, RefreshControl } from 'react-native';
 import { useState, useEffect, useContext } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
@@ -10,6 +10,8 @@ import { LocationContext } from '@/components/LocationContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import Toast from 'react-native-toast-message';
+import * as Haptics from 'expo-haptics';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 
 const Explore = () => {
     const { currentCity } = useContext(LocationContext);
@@ -17,6 +19,7 @@ const Explore = () => {
     const [loading, setLoading] = useState(false);
     const [visibleCount, setVisibleCount] = useState(2);
     const [loadingMore, setLoadingMore] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
     const params = useLocalSearchParams();
     const [selectedFilters, setSelectedFilters] = useState({
         budget: params.budget || null,
@@ -25,8 +28,22 @@ const Explore = () => {
         brand: params.brand || null,
         bodyType: params.bodyType || null,
     });
+
+    // console.log('parms inside explore', params);
     const insets = useSafeAreaInsets();
     const tabBarHeight = useBottomTabBarHeight();
+
+    // Animation setup
+    const opacity = useSharedValue(0);
+
+    const animatedStyle = useAnimatedStyle(() => ({
+        opacity: opacity.value,
+    }));
+
+    // Start fade-in animation on mount
+    useEffect(() => {
+        opacity.value = withTiming(1, { duration: 1000 });
+    }, []);
 
     const handleCardPress = (id) => router.push(`/vehicles/${id}`);
 
@@ -57,7 +74,6 @@ const Explore = () => {
             budget: selectedFilters.budget || null,
             fuelType: selectedFilters.fuelType || null,
             transmission: selectedFilters.transmission || null,
-            location: params.city || currentCity || null,
         };
         Object.keys(requestBody).forEach(key => requestBody[key] === null && delete requestBody[key]);
 
@@ -89,6 +105,24 @@ const Explore = () => {
         }
     };
 
+    // Handle pull-to-refresh
+    const onRefresh = async () => {
+        setRefreshing(true);
+        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        
+        // Reset animation
+        opacity.value = 0;
+        opacity.value = withTiming(1, { duration: 1000 });
+
+        try {
+            await fetchFilterData();
+        } catch (error) {
+            console.error('Error during refresh:', error);
+        } finally {
+            setRefreshing(false);
+        }
+    };
+
     useEffect(() => {
         fetchFilterData();
     }, [JSON.stringify(selectedFilters)]);
@@ -99,14 +133,11 @@ const Explore = () => {
         <SafeAreaView className="bg-white flex-1">
             <View className="px-5">
                 <View className="flex flex-row items-center ml-2 mb-3 justify-between">
-                    <TouchableOpacity onPress={() => router.navigate('/')} className="flex flex-row bg-primary-200 rounded-full size-11 items-center justify-center">
-                        <Image source={icons.backArrow} className="size-5" />
-                    </TouchableOpacity>
                     <Text className="text-base mr-2 text-center font-rubik-medium text-black-300">
                         Search for Your Dream Car
                     </Text>
-                    <TouchableOpacity onPress={() => router.push('/notifications')}>
-                        <Image source={icons.bell} className="size-6" />
+                    <TouchableOpacity onPress={() => router.navigate('/')} className="flex flex-row bg-primary-200 rounded-full size-11 items-center justify-center">
+                        <Image source={icons.backArrow} className="size-5" />
                     </TouchableOpacity>
                 </View>
 
@@ -126,40 +157,50 @@ const Explore = () => {
             {loading ? (
                 <ActivityIndicator size="large" color="#0061ff" style={{ marginTop: 300 }} />
             ) : (
-                <FlatList
-                    data={visibleCars}
-                    renderItem={({ item }) => (
-                        <Card item={item} onPress={() => handleCardPress(item.id)} />
-                    )}
-                    keyExtractor={(item) => item.id.toString()}
-                    numColumns={2}
-                    extraData={selectedFilters}
-                    ListEmptyComponent={
-                        <View className="flex-1 justify-center items-center mt-10">
-                            <Text className="text-center text-red-700 font-rubik-bold text-lg">
-                                {listingData.length === 0 && !Object.values(selectedFilters).some(val => val)
-                                    ? "Select Filters to Start"
-                                    : "No Vehicles Found"}
-                            </Text>
-                            <Text className="text-center text-black-300 mt-2 font-rubik-regular">
-                                {listingData.length === 0 && !Object.values(selectedFilters).some(val => val)
-                                    ? "Choose filters to find your dream car!"
-                                    : "Try adjusting your filters."}
-                            </Text>
-                        </View>
-                    }
-                    ListFooterComponent={
-                        loadingMore && <ActivityIndicator size="small" color="#0061ff" style={{ marginVertical: 10 }} />
-                    }
-                    contentContainerStyle={{
-                        paddingBottom: insets.bottom + tabBarHeight + 80,
-                        paddingTop: 10,
-                    }}
-                    columnWrapperStyle={{ flex: 1, gap: 5, paddingHorizontal: 5 }}
-                    showsVerticalScrollIndicator={false}
-                    onEndReached={loadMoreCars}
-                    onEndReachedThreshold={0.5}
-                />
+                <Animated.View style={animatedStyle}>
+                    <FlatList
+                        data={visibleCars}
+                        renderItem={({ item }) => (
+                            <Card item={item} onPress={() => handleCardPress(item.id)} />
+                        )}
+                        keyExtractor={(item) => item.id.toString()}
+                        numColumns={2}
+                        extraData={selectedFilters}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={refreshing}
+                                onRefresh={onRefresh}
+                                colors={['#0061FF']}
+                                tintColor="#0061FF"
+                            />
+                        }
+                        ListEmptyComponent={
+                            <View className="flex-1 justify-center items-center mt-10">
+                                <Text className="text-center text-red-700 font-rubik-bold text-lg">
+                                    {listingData.length === 0 && !Object.values(selectedFilters).some(val => val)
+                                        ? "Select Filters to Start"
+                                        : "No Vehicles Found"}
+                                </Text>
+                                <Text className="text-center text-black-300 mt-2 font-rubik-regular">
+                                    {listingData.length === 0 && !Object.values(selectedFilters).some(val => val)
+                                        ? "Choose filters to find your dream car!"
+                                        : "Try adjusting your filters."}
+                                </Text>
+                            </View>
+                        }
+                        ListFooterComponent={
+                            loadingMore && <ActivityIndicator size="small" color="#0061ff" style={{ marginVertical: 10 }} />
+                        }
+                        contentContainerStyle={{
+                            paddingBottom: insets.bottom + tabBarHeight + 80,
+                            paddingTop: 10,
+                        }}
+                        columnWrapperStyle={{ flex: 1, gap: 5, paddingHorizontal: 5 }}
+                        showsVerticalScrollIndicator={false}
+                        onEndReached={loadMoreCars}
+                        onEndReachedThreshold={0.5}
+                    />
+                </Animated.View>
             )}
         </SafeAreaView>
     );

@@ -305,6 +305,8 @@ const PopularCard = ({ item, onPress }) => {
   const transmissions = safeParseJSON(item.transmission, []);
   const opacityAnim = useRef(new Animated.Value(0)).current;
 
+  // console.log('car data', item);
+
   useEffect(() => {
     Animated.timing(opacityAnim, {
       toValue: 1,

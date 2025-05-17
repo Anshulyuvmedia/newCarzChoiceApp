@@ -7,13 +7,6 @@ import { useRouter } from 'expo-router';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import { LinearGradient } from 'expo-linear-gradient';
 
-const { width } = Dimensions.get('window');
-
-/**
- * CarNews Component: Displays a list of car news articles
- * @param {Object} props - Component props
- * @param {Array} props.data - Array of car news items
- */
 const CarNews = ({ data }) => {
     const router = useRouter();
 
@@ -71,11 +64,6 @@ const CarNews = ({ data }) => {
     );
 };
 
-/**
- * ExpertReviews Component: Displays a list of expert reviews
- * @param {Object} props - Component props
- * @param {Array} props.data - Array of expert review items
- */
 const ExpertReviews = ({ data }) => {
     const router = useRouter();
 
@@ -133,11 +121,6 @@ const ExpertReviews = ({ data }) => {
     );
 };
 
-/**
- * Videos Component: Displays a list of video items with a playable modal
- * @param {Object} props - Component props
- * @param {Array} props.data - Array of video items
- */
 const Videos = ({ data }) => {
     const [modalVisible, setModalVisible] = React.useState(false);
     const [selectedVideo, setSelectedVideo] = React.useState(null);
@@ -299,9 +282,6 @@ const Videos = ({ data }) => {
     );
 };
 
-/**
- * AllNews Component: Main component with tabs for Car News, Expert Reviews, and Videos
- */
 const AllNews = () => {
     const [index, setIndex] = React.useState(0);
     const [routes] = React.useState([

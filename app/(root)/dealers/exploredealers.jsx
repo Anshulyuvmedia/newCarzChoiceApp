@@ -1,12 +1,13 @@
-import { View, Text, Image, TouchableOpacity, FlatList, ActivityIndicator, Linking } from 'react-native';
+import { View, Text, Image, TouchableOpacity, FlatList, Linking, RefreshControl } from 'react-native';
 import { useState, useEffect, useContext } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
 import axios from 'axios';
+import * as Haptics from 'expo-haptics';
 import icons from '@/constants/icons';
-import Search from '@/components/Search';
 import { LocationContext } from '@/components/LocationContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import SearchDealer from '@/components/SearchDealer';
 
 const ExploreDealers = () => {
     const { currentCity } = useContext(LocationContext);
@@ -14,14 +15,23 @@ const ExploreDealers = () => {
     const [loading, setLoading] = useState(false);
     const [visibleCount, setVisibleCount] = useState(2);
     const [loadingMore, setLoadingMore] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
     const params = useLocalSearchParams();
     const [selectedFilters, setSelectedFilters] = useState({
-        cityname: currentCity,
-        brandname: null,
+        cityname: params.city || currentCity || null,
+        brandname: params.brandname || null,
     });
     const insets = useSafeAreaInsets();
 
-    const handleCardPress = (id) => router.push(`/dealers/${id}`);
+    const handleCardPress = (id) => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        router.push(`/dealers/${id}`);
+    };
+
+    const handleFiltersApplied = (filters) => {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        setSelectedFilters(filters);
+    };
 
     const loadMoreCars = () => {
         if (loadingMore || visibleCount >= listingData.length) return;
@@ -35,15 +45,12 @@ const ExploreDealers = () => {
     const fetchFilterData = async () => {
         setLoading(true);
         setListingData([]);
-
         try {
-            const response = await axios.get("https://carzchoice.com/api/filternewcardealers", {
-                params: {
-                    brandname: params.brand || undefined,
-                    cityname: params.city || currentCity,
-                },
-            });
-
+            const params = {
+                brandname: selectedFilters.brandname || undefined,
+                cityname: selectedFilters.cityname || currentCity || undefined,
+            };
+            const response = await axios.get("https://carzchoice.com/api/filternewcardealers", { params });
             if (response.data.dealers) {
                 const parsedDealers = response.data.dealers.map(dealer => ({
                     ...dealer,
@@ -60,48 +67,80 @@ const ExploreDealers = () => {
         }
     };
 
-    useEffect(() => {
-        setSelectedFilters({
-            cityname: params.city || null,
-            brandname: params.brand || null,
-        });
-
+    const onRefresh = async () => {
+        setRefreshing(true);
+        await fetchFilterData();
         setVisibleCount(2);
+        setRefreshing(false);
+    };
+
+    useEffect(() => {
         fetchFilterData();
-    }, [JSON.stringify(params)]);
+    }, [selectedFilters]);
 
     const visibleCars = listingData.slice(0, visibleCount);
+
+    const renderSkeleton = () => (
+        <View className="m-2">
+            {[...Array(2)].map((_, index) => (
+                <View
+                    key={index}
+                    className="bg-white border border-gray-200 rounded-2xl p-3 flex-row shadow-sm mb-3"
+                >
+                    <View className="w-32 h-28 bg-gray-200 rounded-xl animate-pulse" />
+                    <View className="flex-1 ms-4 justify-between">
+                        <View>
+                            <View className="h-5 bg-gray-200 rounded w-3/4 mb-2 animate-pulse" />
+                            <View className="h-4 bg-gray-200 rounded w-1/2 mb-2 animate-pulse" />
+                            <View className="flex-row gap-2">
+                                <View className="h-4 bg-gray-200 rounded-full w-16 animate-pulse" />
+                                <View className="h-4 bg-gray-200 rounded-full w-16 animate-pulse" />
+                            </View>
+                        </View>
+                        <View className="flex-row mt-2 space-x-3">
+                            <View className="h-8 bg-gray-200 rounded-full w-24 animate-pulse" />
+                            <View className="h-8 bg-gray-200 rounded-full w-24 animate-pulse" />
+                        </View>
+                    </View>
+                </View>
+            ))}
+        </View>
+    );
 
     return (
         <SafeAreaView className="bg-white flex-1">
             <View className="px-5">
                 <View className="flex flex-row items-center ml-2 mb-3 justify-between">
-                    <TouchableOpacity onPress={() => router.navigate('/')} className="flex flex-row bg-primary-200 rounded-full size-11 items-center justify-center">
-                        <Image source={icons.backArrow} className="size-5" />
-                    </TouchableOpacity>
                     <Text className="text-base mr-2 text-center font-rubik-medium text-black-300">
                         Search for Car Dealers
                     </Text>
-                    <TouchableOpacity onPress={() => router.push('/notifications')}>
-                        <Image source={icons.bell} className="size-6" />
+                    <TouchableOpacity
+                        onPress={() => router.navigate('/')}
+                        className="flex flex-row bg-primary-200 rounded-full size-11 items-center justify-center"
+                    >
+                        <Image source={icons.backArrow} className="size-5" />
                     </TouchableOpacity>
                 </View>
-{/* 
+
                 <View className="min-h-[60px]">
-                    <Search selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters} />
-                </View> */}
+                    <SearchDealer
+                        selectedFilters={selectedFilters}
+                        setSelectedFilters={setSelectedFilters}
+                        onFiltersApplied={handleFiltersApplied}
+                    />
+                </View>
 
                 <View className="mt-3">
                     <Text className="text-xl font-rubik-bold text-black-300 capitalize">
                         {listingData.length > 0
-                            ? `${listingData.length} dealers found in ${currentCity}`
+                            ? `${listingData.length} dealers found in ${selectedFilters.cityname || currentCity || 'your area'}`
                             : ''}
                     </Text>
                 </View>
             </View>
 
             {loading ? (
-                <ActivityIndicator size="large" color="#0061ff" style={{ marginTop: 300 }} />
+                renderSkeleton()
             ) : (
                 <FlatList
                     data={visibleCars}
@@ -116,7 +155,6 @@ const ExploreDealers = () => {
                                 className="w-32 h-28 rounded-xl"
                                 resizeMode="cover"
                             />
-
                             <View className="flex-1 ms-4 justify-between">
                                 <View>
                                     <Text className="text-base font-rubik-bold text-black-300 mb-1">
@@ -125,7 +163,6 @@ const ExploreDealers = () => {
                                     <Text className="text-sm text-gray-500 mb-1 font-rubik-medium">
                                         {item.district}, {item.state}
                                     </Text>
-
                                     <View className="flex flex-wrap flex-row gap-1 mb-1">
                                         {item.brands?.map((brand, index) => (
                                             <Text
@@ -137,18 +174,18 @@ const ExploreDealers = () => {
                                         ))}
                                     </View>
                                 </View>
-
                                 <View className="flex-row mt-2 space-x-3">
                                     <TouchableOpacity
                                         onPress={() => handleCardPress(item.userid)}
                                         className="bg-primary-300 px-4 py-1 rounded-full me-2"
                                     >
-                                        <Text className="text-white text-base font-semibold ">View Details</Text>
+                                        <Text className="text-white text-base font-semibold">View Details</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity
                                         onPress={() => {
-                                            const phoneNumber = item.mobilenumber || '1234567890'; 
+                                            const phoneNumber = item.mobilenumber || '1234567890';
                                             const url = `tel:${phoneNumber}`;
+                                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                                             Linking.openURL(url).catch(err => console.error('Error opening dialer:', err));
                                         }}
                                         className="bg-green-500 px-4 py-1 rounded-full"
@@ -158,15 +195,20 @@ const ExploreDealers = () => {
                                 </View>
                             </View>
                         </TouchableOpacity>
-
                     )}
                     keyExtractor={(item) => item.id?.toString()}
-
                     ListEmptyComponent={
                         <View className="flex-1 justify-center items-center">
-                            <Text className="text-center text-red-700 mt-10 font-rubik-bold">Sorry No Dealer Found...</Text>
-                            <Text className="text-center text-black-300 mt-10 font-rubik-bold">But you can sell your vehicle now!</Text>
-                            <TouchableOpacity onPress={() => router.push('/sellvehicle')} className="mt-4 rounded-full bg-primary-300 px-6 py-2">
+                            <Text className="text-center text-red-700 mt-10 font-rubik-bold">
+                                Sorry No Dealer Found...
+                            </Text>
+                            <Text className="text-center text-black-300 mt-10 font-rubik-bold">
+                                But you can sell your vehicle now!
+                            </Text>
+                            <TouchableOpacity
+                                onPress={() => router.push('/sellvehicle')}
+                                className="mt-4 rounded-full bg-primary-300 px-6 py-2"
+                            >
                                 <Text className="text-center text-white">Sell Your Car Now</Text>
                             </TouchableOpacity>
                         </View>
@@ -178,6 +220,14 @@ const ExploreDealers = () => {
                     showsVerticalScrollIndicator={false}
                     onEndReached={loadMoreCars}
                     onEndReachedThreshold={0.5}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={refreshing}
+                            onRefresh={onRefresh}
+                            colors={['#0061ff']}
+                            tintColor={'#0061ff'}
+                        />
+                    }
                 />
             )}
         </SafeAreaView>

@@ -5,7 +5,7 @@ import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 const { width, height } = Dimensions.get('window');
 
-const Carcolorgallery = ({ id }) => {
+const Carcolorgallery = ({ id, headerTitle }) => {
     const [colorData, setColorData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -137,6 +137,10 @@ const Carcolorgallery = ({ id }) => {
         <View style={styles.container}>
             {colorData.length > 0 ? (
                 <>
+
+                    <Text className="text-xl font-rubik-bold px-4 my-3">
+                        {headerTitle} has {colorData?.length} Color Options
+                    </Text>
                     <ScrollView
                         contentContainerStyle={styles.imageList}
                         showsVerticalScrollIndicator={false}

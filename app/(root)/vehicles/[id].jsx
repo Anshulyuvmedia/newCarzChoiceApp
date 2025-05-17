@@ -361,19 +361,22 @@ const CarDetails = () => {
                                 <Text className="text-xl font-rubik-bold px-4 mt-3 text-primary-300">
                                     {CarData.brandname} {CarData.carname}
                                 </Text>
-                                <Text className="text-base font-rubik-bold px-4 mt-1">
-                                    ( {CarData.carmodalname} )
-                                </Text>
+                                <View className="flex flex-row justify-between mt-1">
 
-                                <View className="flex-row border-t-1 mt-4 px-4">
-                                    <Text className="text-black-300 text-base font-rubik-medium mb-1 me-3">Price</Text>
-                                    <Text className="text-primary-300 text-base font-rubik-bold">
-                                        {new Intl.NumberFormat('en-IN', {
-                                            style: 'currency',
-                                            currency: 'INR',
-                                            maximumFractionDigits: 0,
-                                        }).format(CarData.price)}
+                                    <Text className="text-base font-rubik-bold px-4 ">
+                                        ( {CarData.carmodalname} )
                                     </Text>
+
+                                    <View className="flex-row border-t-1 px-4">
+                                        <Text className="text-black-300 text-base font-rubik-medium mb-1 me-3">Price</Text>
+                                        <Text className="text-primary-300 text-base font-rubik-bold">
+                                            {new Intl.NumberFormat('en-IN', {
+                                                style: 'currency',
+                                                currency: 'INR',
+                                                maximumFractionDigits: 0,
+                                            }).format(CarData.price)}
+                                        </Text>
+                                    </View>
                                 </View>
                             </View>
 
@@ -433,11 +436,8 @@ const CarDetails = () => {
         },
         colours: () => (
             <View style={styles.tabContent}>
-                <Text className="text-xl font-rubik-bold px-4 my-3">
-                    {CarData.brandname} {CarData.carname}
-                </Text>
                 <ScrollView className="">
-                    <Carcolorgallery id={CarId} />
+                    <Carcolorgallery id={CarId} headerTitle={`${CarData.brandname} ${CarData.carname}`} />
                 </ScrollView>
             </View>
         ),
@@ -446,7 +446,7 @@ const CarDetails = () => {
                 <Text className="text-xl font-rubik-bold px-4 my-3">
                     Features & Specifications
                 </Text>
-                <ScrollView>
+                <ScrollView className="px-4">
 
                     {Array.isArray(features) && features.length > 0 ? (
                         <View className="bg-white rounded-lg pb-5">

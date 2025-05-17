@@ -61,7 +61,7 @@ const MortgageCalculator = ({ closeSheet, totalprice }) => {
                     showsVerticalScrollIndicator={false}
                 >
                     <View style={styles.infoCard}>
-                        <Text style={styles.infoLabel}>🚗 Car Price</Text>
+                        <Text style={styles.infoLabel}>🚗 Car Current Price:</Text>
                         <Text style={styles.infoValue}>₹ {totalPrice.toLocaleString('en-IN')}</Text>
                     </View>
 
@@ -188,6 +188,9 @@ const styles = StyleSheet.create({
         paddingBottom: 32,
     },
     infoCard: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         backgroundColor: '#FFFFFF',
         borderRadius: 12,
         padding: 16,

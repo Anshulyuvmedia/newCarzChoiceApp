@@ -464,14 +464,11 @@ const SellVehicle = () => {
 
 
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                <TouchableOpacity onPress={() => router.back()} style={{ flexDirection: 'row', backgroundColor: '#E0E0E0', borderRadius: 50, width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
-                    <Image source={icons.backArrow} style={{ width: 20, height: 20 }} />
-                </TouchableOpacity>
                 <Text style={{ fontSize: 16, marginRight: 10, textAlign: 'center', fontFamily: 'Rubik-Medium', color: '#4A4A4A' }}>
                     Sell Your Vehicle
                 </Text>
-                <TouchableOpacity onPress={() => router.push('/notifications')}>
-                    <Image source={icons.bell} className='size-6' />
+                <TouchableOpacity onPress={() => router.back()} style={{ flexDirection: 'row', backgroundColor: '#E0E0E0', borderRadius: 50, width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
+                    <Image source={icons.backArrow} style={{ width: 20, height: 20 }} />
                 </TouchableOpacity>
             </View>
 

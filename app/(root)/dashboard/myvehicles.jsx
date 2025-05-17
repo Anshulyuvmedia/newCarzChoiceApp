@@ -78,13 +78,11 @@ const MyVehicles = () => {
   return (
     <SafeAreaView className="bg-white flex-1 px-4 pb-20 ">
       <View className="flex-row items-center ml-2 justify-between">
-        <TouchableOpacity onPress={() => router.back()} className="flex-row bg-gray-300 rounded-full w-11 h-11 items-center justify-center">
+        <Text className="text-lg mr-2 text-center font-rubik text-gray-700">My Vehicles</Text>
+        <TouchableOpacity onPress={() => router.back()} className="flex-row rounded-full w-11 h-11 items-center justify-center">
           <Image source={icons.backArrow} className="w-5 h-5" />
         </TouchableOpacity>
-        <Text className="text-lg mr-2 text-center font-rubik text-gray-700">My Vehicles</Text>
-        <TouchableOpacity onPress={() => router.push('/notifications')}>
-          <Image source={icons.bell} className='size-6' />
-        </TouchableOpacity>
+
       </View>
 
       <View className="mt-6 mb-12">

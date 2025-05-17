@@ -8,7 +8,7 @@ const Dealerbrands = () => {
     const params = useLocalSearchParams();
     const router = useRouter();
 
-    const [selectedCategory, setSelectedCategory] = useState(params.brand || 'All');
+    const [selectedCategory, setSelectedCategory] = useState(params.brandname || 'All');
     const [brandData, setBrandData] = useState([]);
     const [filteredBrands, setFilteredBrands] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
@@ -24,14 +24,15 @@ const Dealerbrands = () => {
         const updatedParams = { ...params };
 
         if (isRemovingFilter) {
-            delete updatedParams.brand;
+            delete updatedParams.brandname;
             setSelectedCategory('All');
         } else {
-            updatedParams.brand = category;
+            updatedParams.brandname = category;
             setSelectedCategory(category);
         }
 
-        router.push({ pathname: "/../dealers/exploredealers", params: updatedParams });
+        // console.log('Navigating to exploredealers with params:', updatedParams);
+        router.push({ pathname: "/dealers/exploredealers", params: updatedParams });
     };
 
     const fetchBrandList = async () => {
@@ -128,7 +129,6 @@ const Dealerbrands = () => {
                     keyboardShouldPersistTaps="handled"
                 />
             )}
-
         </View>
     );
 };

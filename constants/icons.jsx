@@ -74,10 +74,12 @@ import chassis from "@/assets/icons/chassis.png";
 import gearshift from "@/assets/icons/gearshift.png";
 import piston from "@/assets/icons/piston.png";
 import bluerightarrow from "@/assets/icons/bluerightarrow.png";
+import newspaper from "@/assets/icons/newspaper.png";
 
 export default {
   engineDisplacement,
   fuel,
+  newspaper,
   bluerightarrow,
   fast,
   gearshift,
