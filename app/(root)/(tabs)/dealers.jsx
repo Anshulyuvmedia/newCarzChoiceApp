@@ -1,8 +1,7 @@
 import { View, Text, Image, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import { useState, useEffect, useContext } from 'react';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
-import axios from 'axios';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeIn, FadeInDown, useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import icons from '@/constants/icons';
@@ -33,7 +32,7 @@ const Dealers = () => {
 
     // Handle explore navigation with debug logging
     const handleExplorePress = () => {
-        console.log('Navigating to /dealers/exploredealers with params:', { city: currentCity || null });
+        // console.log('Navigating to /dealers/exploredealers with params:', { city: currentCity || null });
         router.push({
             pathname: '/dealers/exploredealers',
             params: { city: currentCity || null },
@@ -41,7 +40,7 @@ const Dealers = () => {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-gray-50">
+        <View className="flex-1 bg-gray-50">
             {loading ? (
                 <ActivityIndicator size="large" color="#0061ff" style={{ marginTop: 300 }} />
             ) : (
@@ -124,7 +123,7 @@ const Dealers = () => {
                     }}
                 />
             )}
-        </SafeAreaView>
+        </View>
     );
 };
 

@@ -1,6 +1,5 @@
 import { StyleSheet, Text, View, ScrollView, ActivityIndicator, Platform, TouchableOpacity, Image, TextInput, Alert } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast, { BaseToast } from 'react-native-toast-message';
 import icons from '@/constants/icons';
 import RNPickerSelect from 'react-native-picker-select';
@@ -357,7 +356,7 @@ const carInsurance = () => {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
+        <View style={styles.container}>
             <LinearGradient
                 colors={['#F7F9FC', '#E8ECEF']}
                 style={styles.header}
@@ -511,7 +510,7 @@ const carInsurance = () => {
                     </LinearGradient>
                 </TouchableOpacity>
             </Animated.View>
-        </SafeAreaView>
+        </View>
     );
 };
 

@@ -1,10 +1,8 @@
 import { StyleSheet, Text, TouchableOpacity, View, Image, FlatList, ActivityIndicator } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import images from '@/constants/images';
 import icons from '@/constants/icons';
 
 const MyEnquires = () => {
@@ -65,7 +63,7 @@ const MyEnquires = () => {
     };
 
     return (
-        <SafeAreaView className="bg-white flex-1 px-4 pb-20 ">
+        <View className="bg-white flex-1 px-4 pb-20 ">
             <View className="flex-row items-center ml-2 justify-between">
                 <Text className="text-lg mr-2 text-center font-rubik-bold text-black">My Enquires</Text>
                 <TouchableOpacity onPress={() => router.back()} className="flex-row rounded-full w-11 h-11 items-center justify-center">
@@ -141,7 +139,7 @@ const MyEnquires = () => {
                     />
                 )}
             </View>
-        </SafeAreaView>
+        </View>
     );
 };
 

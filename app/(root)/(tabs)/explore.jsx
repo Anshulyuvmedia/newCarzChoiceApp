@@ -1,6 +1,5 @@
 import { View, Text, Image, TouchableOpacity, FlatList, ActivityIndicator, RefreshControl } from 'react-native';
 import { useState, useEffect, useContext } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
 import axios from 'axios';
 import icons from '@/constants/icons';
@@ -130,7 +129,7 @@ const Explore = () => {
     const visibleCars = Array.isArray(listingData) ? listingData.slice(0, visibleCount) : [];
 
     return (
-        <SafeAreaView className="bg-white flex-1">
+        <View className="bg-white flex-1">
             <View className="px-5">
                 <View className="flex flex-row items-center ml-2 mb-3 justify-between">
                     <Text className="text-base mr-2 text-center font-rubik-medium text-black-300">
@@ -202,7 +201,7 @@ const Explore = () => {
                     />
                 </Animated.View>
             )}
-        </SafeAreaView>
+        </View>
     );
 };
 

@@ -2,7 +2,6 @@ import { View, Text, ScrollView, Image, TouchableOpacity, Alert, ActivityIndicat
 import React, { useEffect, useState } from 'react';
 import images from '@/constants/images';
 import icons from '@/constants/icons';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { settings } from '@/constants/data';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -89,7 +88,7 @@ const Dashboard = () => {
 
 
   return (
-    <SafeAreaView>
+    <View>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="pb-32 px-7">
         {loading ? (
           <ActivityIndicator size="large" color="#0061ff" style={{ marginTop: 400 }} />
@@ -148,30 +147,60 @@ const Dashboard = () => {
 
             <View className="flex flex-col mt-5 border-primary-200">
               {settings.map((item, index) => (
-                <TouchableOpacity key={index} onPress={() => router.push(item.onPress)} className="flex flex-row items-center py-2 border border-gray-300 mb-2 rounded-2xl ps-4 bg-white">
-                  <Image source={item.icon} className="size-6" />
-                  <View>
-                    <Text className="text-lg font-rubik-medium text-black-300 ml-3">{item.title}</Text>
-                    <Text className="text-sm font-rubik text-gray-700 ml-3">{item.subtitle}</Text>
+                <TouchableOpacity key={index} onPress={() => router.push(item.onPress)} className="flex flex-row justify-between items-center py-2 border border-gray-300 mb-2 rounded-2xl ps-4 bg-white">
+                  <View className="flex flex-row items-center">
+                    <Image source={item.icon} className="size-6" />
+                    <View>
+                      <Text className="text-lg font-rubik-medium text-black-300 ml-3">{item.title}</Text>
+                      <Text className="text-sm font-rubik text-gray-700 ml-3">{item.subtitle}</Text>
+                    </View>
+                  </View>
+                  <View className="me-3">
+                    <Image source={icons.rightArrow} className="size-6 ms-auto" />
                   </View>
                 </TouchableOpacity>
               ))}
             </View>
 
-            <View className="flex flex-col mt-5 border-t pt-5 border-primary-200">
-
-              <TouchableOpacity onPress={() => router.push('./allnews')} className="flex flex-row items-center py-2 border border-gray-300 mb-2 rounded-2xl ps-4 bg-white">
-                <Image source={icons.newspaper} className="size-8 backgroundColor: blue" />
-                <View>
-                  <Text className="text-lg font-rubik-medium text-black-300 ml-3">News</Text>
-                  <Text className="text-sm font-rubik text-gray-700 ml-3">All Car News & Expert Reviews</Text>
+            <View className="flex flex-col mt-5">
+              <TouchableOpacity
+                onPress={() => router.push('/dashboard/registerdealer')}
+                className="flex flex-row items-center justify-between py-2 border border-gray-300 mb-2 rounded-2xl ps-4 bg-white "
+              >
+                <View className="flex flex-row items-center">
+                  <Image source={icons.person} className="size-6" />
+                  <View>
+                    <Text className="text-lg font-rubik-medium text-black-300 ml-3">Become A Dealer</Text>
+                    <Text className="text-sm font-rubik text-gray-700 ml-3">Sell Car of Multiple Brands</Text>
+                  </View>
+                </View>
+                <View className="me-3">
+                  <Image source={icons.rightArrow} className="size-6 ms-auto" />
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => router.push('/dashboard/support')} className="flex flex-row items-center py-2 border border-gray-300 mb-2 rounded-2xl ps-4 bg-white">
-                <Image source={icons.customersupport} className="size-8 backgroundColor: blue" />
-                <View>
-                  <Text className="text-lg font-rubik-medium text-black-300 ml-3">Help & Support</Text>
-                  <Text className="text-sm font-rubik text-gray-700 ml-3">Help Center & Legal terms</Text>
+
+              <TouchableOpacity onPress={() => router.push('./allnews')} className="flex flex-row items-center justify-between py-2 border border-gray-300 mb-2 rounded-2xl ps-4 bg-white">
+                <View className="flex flex-row items-center">
+                  <Image source={icons.newspaper} className="size-8 backgroundColor: blue" />
+                  <View>
+                    <Text className="text-lg font-rubik-medium text-black-300 ml-3">News</Text>
+                    <Text className="text-sm font-rubik text-gray-700 ml-3">All Car News & Expert Reviews</Text>
+                  </View>
+                </View>
+                <View className="me-3">
+                  <Image source={icons.rightArrow} className="size-6 ms-auto" />
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => router.push('/dashboard/support')} className="flex flex-row justify-between items-center py-2 border border-gray-300 mb-2 rounded-2xl ps-4 bg-white">
+                <View className="flex flex-row items-center">
+                  <Image source={icons.customersupport} className="size-8 backgroundColor: blue" />
+                  <View>
+                    <Text className="text-lg font-rubik-medium text-black-300 ml-3">Help & Support</Text>
+                    <Text className="text-sm font-rubik text-gray-700 ml-3">Help Center & Legal terms</Text>
+                  </View>
+                </View>
+                <View className="me-3">
+                  <Image source={icons.rightArrow} className="size-6 ms-auto" />
                 </View>
               </TouchableOpacity>
 
@@ -180,7 +209,7 @@ const Dashboard = () => {
           </View>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 

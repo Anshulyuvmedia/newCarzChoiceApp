@@ -1,6 +1,5 @@
 import { View, Text, Image, TouchableOpacity, FlatList, Linking, RefreshControl } from 'react-native';
 import { useState, useEffect, useContext } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
 import axios from 'axios';
 import * as Haptics from 'expo-haptics';
@@ -108,7 +107,7 @@ const ExploreDealers = () => {
     );
 
     return (
-        <SafeAreaView className="bg-white flex-1">
+        <View className="bg-white flex-1">
             <View className="px-5">
                 <View className="flex flex-row items-center ml-2 mb-3 justify-between">
                     <Text className="text-base mr-2 text-center font-rubik-medium text-black-300">
@@ -221,7 +220,7 @@ const ExploreDealers = () => {
                     }
                 />
             )}
-        </SafeAreaView>
+        </View>
     );
 };
 

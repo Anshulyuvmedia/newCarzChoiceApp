@@ -362,8 +362,8 @@ const AllNews = () => {
     if (loading) {
         return (
             <View style={styles.centerContainer}>
-                    <ActivityIndicator size="large" color="#fff" />
-                    <Text style={styles.loadingText}>Loading News...</Text>
+                <ActivityIndicator size="large" color="#fff" />
+                <Text style={styles.loadingText}>Loading News...</Text>
             </View>
         );
     }
@@ -389,35 +389,37 @@ const AllNews = () => {
     }
 
     return (
-        <TabView
-            navigationState={{ index, routes }}
-            renderScene={renderScene}
-            onIndexChange={setIndex}
-            initialLayout={{ width: Dimensions.get('window').width }}
-            renderTabBar={props => (
-                <View style={styles.tabBar}>
-                    {props.navigationState.routes.map((route, i) => (
-                        <Pressable
-                            key={route.key}
-                            style={[
-                                styles.tabItem,
-                                index === i && styles.tabItemActive,
-                            ]}
-                            onPress={() => setIndex(i)}
-                        >
-                            <Text
+        <View className="flex-1">
+            <TabView
+                navigationState={{ index, routes }}
+                renderScene={renderScene}
+                onIndexChange={setIndex}
+                initialLayout={{ width: Dimensions.get('window').width }}
+                renderTabBar={props => (
+                    <View style={styles.tabBar}>
+                        {props.navigationState.routes.map((route, i) => (
+                            <Pressable
+                                key={route.key}
                                 style={[
-                                    styles.tabText,
-                                    index === i && styles.tabTextActive,
+                                    styles.tabItem,
+                                    index === i && styles.tabItemActive,
                                 ]}
+                                onPress={() => setIndex(i)}
                             >
-                                {route.title}
-                            </Text>
-                        </Pressable>
-                    ))}
-                </View>
-            )}
-        />
+                                <Text
+                                    style={[
+                                        styles.tabText,
+                                        index === i && styles.tabTextActive,
+                                    ]}
+                                >
+                                    {route.title}
+                                </Text>
+                            </Pressable>
+                        ))}
+                    </View>
+                )}
+            />
+        </View>
     );
 };
 

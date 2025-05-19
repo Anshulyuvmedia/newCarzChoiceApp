@@ -1,6 +1,5 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View, TextInput, FlatList, Platform, ScrollView, ActivityIndicator } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import icons from '@/constants/icons';
 import { ProgressSteps, ProgressStep } from 'react-native-progress-steps';
 import * as ImagePicker from 'expo-image-picker';
@@ -460,7 +459,7 @@ const SellVehicle = () => {
     }, [city]);
 
     return (
-        <SafeAreaView style={{ backgroundColor: 'white', height: '100%', paddingHorizontal: 20 }}>
+        <View style={{ backgroundColor: 'white', height: '100%', paddingHorizontal: 20 }}>
 
 
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -819,7 +818,7 @@ const SellVehicle = () => {
                     </View>
                 )
             }
-        </SafeAreaView>
+        </View>
     )
 }
 

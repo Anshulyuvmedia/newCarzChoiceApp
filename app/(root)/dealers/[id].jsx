@@ -114,7 +114,7 @@ const DealerDetails = () => {
             const response = await axios.get(`https://carzchoice.com/api/newcardealercarlist/${dealerId}`);
             if (response.data && response.data.dealercarlist) {
                 const formattedData = Object.values(response.data.dealercarlist).map((item) => {
-                    console.log('formattedData', item);
+                    // console.log('formattedData', item);
                     let parsedImages = [];
                     try {
                         parsedImages = item.images ? JSON.parse(item.images) : [];

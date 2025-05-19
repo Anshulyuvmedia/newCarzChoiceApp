@@ -1,6 +1,5 @@
 import { StyleSheet, Text, View, ScrollView, ActivityIndicator, Platform, TouchableOpacity, Image, TextInput } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast, { BaseToast } from 'react-native-toast-message';
 import icons from '@/constants/icons';
 import images from '@/constants/images';
@@ -250,7 +249,7 @@ const CarLoan = () => {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
+        <View style={{ flex: 1 }}>
 
             <View style={{ flex: 1, paddingHorizontal: 20 }}>
                 <View className="flex flex-row items-center justify-between my-5">
@@ -367,7 +366,7 @@ const CarLoan = () => {
                 )}
             </View>
 
-        </SafeAreaView>
+        </View>
     )
 }
 

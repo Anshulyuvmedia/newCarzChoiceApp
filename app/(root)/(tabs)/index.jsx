@@ -1,6 +1,5 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, ActivityIndicator, RefreshControl } from 'react-native';
 import React, { useEffect, useState, useContext, useCallback } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import images from '@/constants/images';
 import Search from '@/components/Search';
 import { Card, LocationCard, FeaturedCard, PopularCard } from '@/components/Cards';
@@ -187,7 +186,7 @@ const Index = () => {
     }, []);
 
     return (
-        <SafeAreaView className='bg-white h-full '>
+        <View className='bg-white h-full '>
             <View className='flex flex-row items-center justify-between px-3'>
                 <TouchableOpacity onPress={() => router.push('/dashboard')} className='flex flex-row items-center ml-2 justify-center'>
                     <Image source={images.applogo} className='w-24 h-12' />
@@ -318,7 +317,7 @@ const Index = () => {
                     />
                 </Animated.View>
             )}
-        </SafeAreaView>
+        </View>
     );
 };
 

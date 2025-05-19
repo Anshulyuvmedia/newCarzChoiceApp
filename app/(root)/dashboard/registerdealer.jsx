@@ -1,6 +1,5 @@
 import { StyleSheet, Text, View, ScrollView, ActivityIndicator, FlatList, TouchableOpacity, Image, TextInput } from 'react-native';
 import React, { useEffect, useState, useRef } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast, { BaseToast } from 'react-native-toast-message';
 import icons from '@/constants/icons';
 import RNPickerSelect from 'react-native-picker-select';
@@ -389,7 +388,7 @@ const RegisterDealer = () => {
 
 
     return (
-        <SafeAreaView className="flex-1">
+        <View className="flex-1">
             {loading ? (
                 <ActivityIndicator size="large" color="#0061ff" style={{ marginTop: 400 }} />
             ) : (
@@ -592,7 +591,7 @@ const RegisterDealer = () => {
                     </TouchableOpacity>
                 </View>
             )}
-        </SafeAreaView>
+        </View>
     )
 }
 

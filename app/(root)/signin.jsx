@@ -9,11 +9,9 @@ import {
   ActivityIndicator,
   TextInput,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import images from '@/constants/images';
-import icons from '@/constants/icons';
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from "expo-web-browser";
 import Constants from "expo-constants";
@@ -124,7 +122,7 @@ const Signin = () => {
   }, [response]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Image source={images.applogo} style={styles.logo} resizeMode="contain" />
 
@@ -147,7 +145,7 @@ const Signin = () => {
       <View style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 9999 }}>
         <Toast config={toastConfig} position="top" />
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

@@ -1,8 +1,8 @@
 import { View, Text, ScrollView, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import icons from '@/constants/icons';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast, { BaseToast } from 'react-native-toast-message';
 import * as Linking from 'expo-linking';
 const Support = () => {
@@ -59,7 +59,7 @@ const Support = () => {
     };
 
     return (
-        <SafeAreaView>
+        <View>
             <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="pb-32 px-7">
                 {loading ? (
                     <ActivityIndicator size="large" color="#0061ff" style={{ marginTop: 400 }} />
@@ -112,7 +112,7 @@ const Support = () => {
                     </View>
                 )}
             </ScrollView>
-        </SafeAreaView>
+        </View>
     );
 };
 
