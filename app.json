@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.oldcarz.choice",
+      "bundleIdentifier": "com.newcarz.choice",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app uses your location to show your current city."
       }
@@ -20,8 +20,11 @@
         "foregroundImage": "./assets/images/carz-logo.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.oldcarz.choice",
-      "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"]
+      "package": "com.newcarz.choice",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -71,7 +74,7 @@
       "WEB_CLIENT_ID": "722158200156-u555v22qhd1j0euc44uffpv1isu3iqpm.apps.googleusercontent.com",
       "IOS_CLIENT_ID": "722158200156-95qqsv8tcm227b5lan64r2c907to89a2.apps.googleusercontent.com",
       "eas": {
-        "projectId": "f1f7ea03-c4c5-43c2-929a-dac5cb2c84da"
+        "projectId": "3437f9e6-a4ca-486e-979d-991fac688c84"
       }
     }
   }

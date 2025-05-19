@@ -1,6 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, View, Image, Animated, Easing } from 'react-native';
 import React, { useEffect, useRef } from 'react';
-import images from '@/constants/images';
 import icons from '@/constants/icons';
 
 // Create an animated version of TouchableOpacity

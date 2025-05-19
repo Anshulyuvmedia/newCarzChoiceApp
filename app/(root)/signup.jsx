@@ -231,7 +231,9 @@ const Signup = () => {
             </Link>
           </TouchableOpacity>
         </View>
-        <Toast config={toastConfig} position="bottom" />
+        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 9999 }}>
+          <Toast config={toastConfig} position="top" />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

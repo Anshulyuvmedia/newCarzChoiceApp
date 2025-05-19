@@ -38,25 +38,25 @@ const Support = () => {
     };
 
 
-  const handleLogout = async () => {
-    try {
-      await AsyncStorage.clear();
-      Toast.show({
-        type: 'success',
-        text1: 'Logged Out',
-        text2: 'You have been logged out successfully.',
-        position: 'bottom',  // Optional: top, bottom, or center
-        visibilityTime: 4000, // Duration in ms
-        autoHide: true,
-      });
+    const handleLogout = async () => {
+        try {
+            await AsyncStorage.clear();
+            Toast.show({
+                type: 'success',
+                text1: 'Logged Out',
+                text2: 'You have been logged out successfully.',
+                position: 'bottom',  // Optional: top, bottom, or center
+                visibilityTime: 4000, // Duration in ms
+                autoHide: true,
+            });
 
-      setTimeout(() => {
-        router.push('/signin'); // Ensure redirection happens after showing the toast
-      }, 1000);
-    } catch (error) {
-      console.error('Error during logout:', error);
-    }
-  };
+            setTimeout(() => {
+                router.push('/signin'); // Ensure redirection happens after showing the toast
+            }, 1000);
+        } catch (error) {
+            console.error('Error during logout:', error);
+        }
+    };
 
     return (
         <SafeAreaView>
@@ -65,7 +65,9 @@ const Support = () => {
                     <ActivityIndicator size="large" color="#0061ff" style={{ marginTop: 400 }} />
                 ) : (
                     <View>
-                        <Toast config={toastConfig} position="top" />
+                        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 9999 }}>
+                            <Toast config={toastConfig} position="top" />
+                        </View>
                         <View className="flex flex-row items-center justify-between my-5">
                             <Text className="text-xl font-rubik-bold upper">Help & Support</Text>
 

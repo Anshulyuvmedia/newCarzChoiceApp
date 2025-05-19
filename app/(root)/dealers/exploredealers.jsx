@@ -202,15 +202,6 @@ const ExploreDealers = () => {
                             <Text className="text-center text-red-700 mt-10 font-rubik-bold">
                                 Sorry No Dealer Found...
                             </Text>
-                            <Text className="text-center text-black-300 mt-10 font-rubik-bold">
-                                But you can sell your vehicle now!
-                            </Text>
-                            <TouchableOpacity
-                                onPress={() => router.push('/sellvehicle')}
-                                className="mt-4 rounded-full bg-primary-300 px-6 py-2"
-                            >
-                                <Text className="text-center text-white">Sell Your Car Now</Text>
-                            </TouchableOpacity>
                         </View>
                     }
                     contentContainerStyle={{

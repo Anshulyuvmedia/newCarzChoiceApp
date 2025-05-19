@@ -29,7 +29,7 @@
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="newCarzChoiceApp"/>
-        <data android:scheme="com.oldcarz.choice"/>
+        <data android:scheme="com.newcarz.choice"/>
         <data android:scheme="exp+newcarzchoiceapp"/>
       </intent-filter>
     </activity>

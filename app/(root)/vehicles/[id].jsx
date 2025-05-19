@@ -33,7 +33,7 @@ const CarDetails = () => {
     const carouselRef = useRef(null);
     const navigation = useNavigation();
     const [specifications, setSpecifications] = useState([]);
-    const [similarCarsData, setSimilarCarsData] = useState([]);
+    const [variantsCarsData, setVariantsCarsData] = useState([]);
     const [features, setFeatures] = useState([]);
     const [prosConsData, setProsConsData] = useState([]);
     const [faqData, setFaqData] = useState([]);
@@ -108,6 +108,7 @@ const CarDetails = () => {
                 fullname: parsedUserData.fullname || "Unknown",
                 userid: parsedUserData.id,
                 carid: CarId,
+                cartype: 'newcarlead',
                 mobile: parsedUserData.contactno || "",
                 email: parsedUserData.email || "",
                 vehiclename: `${CarData?.manufactureyear || ''} ${CarData?.brandname || ''} ${CarData?.carname || ''} ${CarData?.modalname || ''}`.trim() || "Unknown Vehicle",
@@ -216,7 +217,7 @@ const CarDetails = () => {
                 setCarData(apiData);
                 setSpecifications(parsedSpecifications);
                 setFeatures(parsedFeatures);
-                setSimilarCarsData(response.data.data.cardetails.variants);
+                setVariantsCarsData(response.data.data.cardetails.variants);
                 setProsConsData({
                     pros: response.data.data.pros,
                     cons: response.data.data.cons
@@ -428,7 +429,7 @@ const CarDetails = () => {
             return (
                 <View className="flex-1">
                     <VariantsList
-                        data={similarCarsData}
+                        data={variantsCarsData}
                         headerTitle={`${CarData.brandname} ${CarData.carname} variants price list`}
                     />
                 </View>
@@ -535,7 +536,9 @@ const CarDetails = () => {
 
     return (
         <View className="flex-1">
-            <Toast config={toastConfig} position="bottom" />
+            <View style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 9999 }}>
+                <Toast config={toastConfig} position="top" />
+            </View>
             <View style={[styles.tabView, { paddingBottom: 80 }]}>
                 <TabView
                     navigationState={{ index, routes }}

@@ -88,7 +88,7 @@ const CompareOtherCars = ({ data, headerTitle, currentCar, currentCarId }) => {
         const isCompareDisabled = !currentCarId || !car.id;
 
         return (
-            <View style={styles.carCard}>
+            <TouchableOpacity style={styles.carCard} onPress={() => router.push(`/vehicles/${car.id}`)}>
                 {car.addimage ? (
                     <Image
                         source={{ uri: `https://carzchoice.com/assets/backend-assets/images/${car.addimage}` }}
@@ -132,7 +132,7 @@ const CompareOtherCars = ({ data, headerTitle, currentCar, currentCarId }) => {
                         <Text style={styles.compareButtonText}>Compare</Text>
                     </LinearGradient>
                 </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
         );
     };
 

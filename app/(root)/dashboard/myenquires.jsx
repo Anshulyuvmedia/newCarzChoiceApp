@@ -8,7 +8,7 @@ import images from '@/constants/images';
 import icons from '@/constants/icons';
 
 const MyEnquires = () => {
-    const [userPropertyData, setUserPropertyData] = useState([]);
+    const [userLeadData, setUserLeadData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [visibleItemsCount, setVisibleItemsCount] = useState(8); // To control number of visible items
     const router = useRouter();
@@ -20,7 +20,7 @@ const MyEnquires = () => {
             const parsedUserData = JSON.parse(await AsyncStorage.getItem('userData'));
 
             // Fetch user cars from API
-            const response = await axios.get(`https://carzchoice.com/api/getmyenquires/${parsedUserData.id}`);
+            const response = await axios.get(`https://carzchoice.com/api/getnewcarenquires/${parsedUserData.id}`);
             // console.log('API Response:', response.data.data); // Log the API response
             if (response.data && response.data.data) {
                 const formattedData = response.data.data.map((item) => {
@@ -29,6 +29,7 @@ const MyEnquires = () => {
                         id: item.carid,
                         carname: item.vehicle,
                         remarks: item.remarks,
+                        cartype: item.cartype,
                         mobile: item.mobile,
                         created_at: new Date(item.created_at).toLocaleDateString('en-US', {
                             year: 'numeric',
@@ -40,8 +41,8 @@ const MyEnquires = () => {
                         state: item.state,
                     };
                 });
-
-                setUserPropertyData(formattedData);
+                // Only store data whose cartype is 'newcarlead'
+                setUserLeadData(formattedData);
             } else {
                 console.error('Unexpected API response format:', response.data);
             }
@@ -58,7 +59,7 @@ const MyEnquires = () => {
 
     // Handle loading more items on scroll
     const loadMoreItems = () => {
-        if (userPropertyData.length > visibleItemsCount) {
+        if (userLeadData.length > visibleItemsCount) {
             setVisibleItemsCount(visibleItemsCount + 8); // Increase the visible items by 8
         }
     };
@@ -78,11 +79,11 @@ const MyEnquires = () => {
                         <ActivityIndicator size="large" color="#0061ff" style={{ marginTop: 300 }} />
                         <Text className="text-center text-gray-500 mt-10">Loading car...</Text>
                     </View>
-                ) : userPropertyData.length === 0 ? (
+                ) : userLeadData.length === 0 ? (
                     <Text className="text-center text-gray-500 mt-10">No cars found.</Text>
                 ) : (
                     <FlatList
-                        data={userPropertyData.slice(0, visibleItemsCount)} // Slice data to show only the visible items
+                        data={userLeadData.slice(0, visibleItemsCount)} // Slice data to show only the visible items
                         keyExtractor={(item) => item.id.toString()}
                         showsVerticalScrollIndicator={false}
                         renderItem={({ item, index }) => (

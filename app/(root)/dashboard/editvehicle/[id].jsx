@@ -558,7 +558,9 @@ const EditVehicle = () => {
                 <Text className="font-rubik-bold text-lg">{carData.name}</Text>
                 <Text className={`inline-flex items-center rounded-md capitalize px-2 py-1 text-xs font-rubik-bold border ${vehicleStatus === 'Activated' ? ' bg-green-50  text-green-700  border-green-600 ' : 'bg-red-50  text-red-700 border-red-600'}`}>{vehicleStatus === 'Activated' ? 'Activated' : 'Under Review'}</Text>
             </View>
-            <Toast config={toastConfig} position="top" />
+            <View style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 9999 }}>
+                <Toast config={toastConfig} position="top" />
+            </View>
 
             <View style={styles.container}>
                 <ProgressSteps>

@@ -95,7 +95,9 @@ const Dashboard = () => {
           <ActivityIndicator size="large" color="#0061ff" style={{ marginTop: 400 }} />
         ) : (
           <View>
-            <Toast config={toastConfig} position="top" />
+            <View style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 9999 }}>
+              <Toast config={toastConfig} position="top" />
+            </View>
             <View className="flex flex-row items-center justify-between my-5">
               <Text className="text-xl font-rubik-bold upper">My Account</Text>
 

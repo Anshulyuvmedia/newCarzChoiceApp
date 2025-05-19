@@ -114,7 +114,7 @@ const DealerDetails = () => {
             const response = await axios.get(`https://carzchoice.com/api/newcardealercarlist/${dealerId}`);
             if (response.data && response.data.dealercarlist) {
                 const formattedData = Object.values(response.data.dealercarlist).map((item) => {
-                    console.log('formattedData',item);
+                    console.log('formattedData', item);
                     let parsedImages = [];
                     try {
                         parsedImages = item.images ? JSON.parse(item.images) : [];
@@ -235,7 +235,9 @@ const DealerDetails = () => {
             colors={['#e5e7eb', '#f3f4f6']}
             style={styles.container}
         >
-            <Toast config={toastConfig} position="top" />
+            <View style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 9999 }}>
+                <Toast config={toastConfig} position="top" />
+            </View>
             <View className="flex-row justify-between items-center my-6 px-5">
                 <Text className="text-2xl font-bold text-gray-900">Dealer Profile</Text>
                 <TouchableOpacity

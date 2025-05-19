@@ -86,9 +86,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.oldcarz.choice'
+    namespace 'com.newcarz.choice'
     defaultConfig {
-        applicationId 'com.oldcarz.choice'
+        applicationId 'com.newcarz.choice'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

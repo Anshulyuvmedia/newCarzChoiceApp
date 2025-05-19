@@ -33,7 +33,13 @@ const Index = () => {
     const [upcomingCars, setUpcomingCars] = useState([]);
     const [offerCars, setOfferCars] = useState([]);
     const [topCarsIndia, setTopCarsIndia] = useState([]);
-
+    const [selectedFilters, setSelectedFilters] = useState({
+        budget: null,
+        fuelType: null,
+        transmission: null,
+        brand: null,
+        bodyType: null,
+    });
     // Animation setup
     const opacity = useSharedValue(0);
 
@@ -155,7 +161,7 @@ const Index = () => {
     const onRefresh = useCallback(async () => {
         setRefreshing(true);
         await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-        
+
         // Reset animation
         opacity.value = 0;
         opacity.value = withTiming(1, { duration: 1000 });
@@ -217,7 +223,7 @@ const Index = () => {
                         onEndReachedThreshold={0.5}
                         ListHeaderComponent={
                             <View className='px-3 '>
-                                <Search />
+                                <Search selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters} />
                                 <View className='mt-5'>
                                     <BannerSlider />
                                 </View>

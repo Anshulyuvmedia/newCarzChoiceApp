@@ -5,6 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import './globals.css';
 import Toast from 'react-native-toast-message';
 import { View } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 
 export default function RootLayout() {
     const [fontsLoaded] = useFonts({
@@ -65,6 +66,8 @@ export default function RootLayout() {
 
     return (
         <View style={{ flex: 1 }}>
+            <StatusBar style="dark" />
+
             <Stack screenOptions={{ headerShown: false }} />
             <Toast />
         </View>

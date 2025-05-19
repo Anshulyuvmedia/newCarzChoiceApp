@@ -1,4 +1,4 @@
-package com.oldcarz.choice
+package com.newcarz.choice
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build
