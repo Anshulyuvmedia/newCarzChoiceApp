@@ -23,7 +23,7 @@ const MyEnquires = () => {
             // console.log('API Response:', response.data.data); // Log the API response
             if (response.data && response.data.data) {
                 const formattedData = response.data.data.map((item) => {
-                    console.log('item:',item);
+                    // console.log('item:',item);
                     return {
                         id: item.carid,
                         carname: item.vehicle,

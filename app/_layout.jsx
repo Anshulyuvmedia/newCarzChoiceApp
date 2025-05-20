@@ -67,7 +67,7 @@ export default function RootLayout() {
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
-            <StatusBar style="auto" />
+            <StatusBar style="dark" />
 
             <Stack screenOptions={{ headerShown: false }} />
             <Toast />

@@ -275,21 +275,20 @@ const CompareScreen = () => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.headerTitle}>Compare Vehicles</Text>
+            {/* Header */}
+            <LinearGradient
+                colors={['#0061ff', '#003087']}
+                className="p-3 px-5 mb-4 flex-row items-center justify-between"
+            >
+                <Text className="text-xl font-rubik-bold text-white">Compare Vehicles</Text>
                 <TouchableOpacity
                     onPress={() => router.back()}
-                    style={styles.backButton}
-                    activeOpacity={0.7}
+                    className="bg-white/80 p-2 rounded-lg"
+                    accessibilityLabel="Go back"
                 >
-                    <LinearGradient
-                        colors={['#FFFFFF', '#E8ECEF']}
-                        style={styles.backButtonGradient}
-                    >
-                        <Image source={icons.backArrow} style={styles.icon} />
-                    </LinearGradient>
+                    <Image source={icons.backArrow} className="w-6 h-6 tint-white" />
                 </TouchableOpacity>
-            </View>
+            </LinearGradient>
 
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 {/* Car Images and Overview */}

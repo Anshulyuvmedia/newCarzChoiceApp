@@ -11,6 +11,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 
 const EditProfile = () => {
+    // Initialize state with defaults as empty, to be updated from AsyncStorage
     const [image, setImage] = useState(null);
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
@@ -30,8 +31,30 @@ const EditProfile = () => {
         transform: [{ scale: withSpring(buttonScale.value) }],
     }));
 
-    // Fetch existing profile data
+    // Load defaults from AsyncStorage on mount
     useEffect(() => {
+        const loadAsyncStorageDefaults = async () => {
+            try {
+                const storedUserData = await AsyncStorage.getItem('userData');
+                if (storedUserData) {
+                    const parsedUserData = JSON.parse(storedUserData);
+                    setUserId(parsedUserData.id || null);
+                    setUsername(parsedUserData.fullname || '');
+                    setEmail(parsedUserData.email || '');
+                    setPhoneNumber(parsedUserData.contactno || '');
+                    setUsertype(parsedUserData.usertype || '');
+                    setDistrict(parsedUserData.district || '');
+                    setState(parsedUserData.state || '');
+                    setPincode(parsedUserData.pincode || '');
+                    setAddress(parsedUserData.addresss || '');
+                    setImage(parsedUserData.dp || images.avatar);
+                }
+            } catch (error) {
+                console.error('Error loading AsyncStorage defaults:', error);
+            }
+        };
+
+        loadAsyncStorageDefaults();
         fetchProfileData();
     }, []);
 
@@ -51,13 +74,7 @@ const EditProfile = () => {
             const data = response.data?.userData?.[0];
 
             if (!data || typeof data !== 'object') {
-                console.error("Invalid API response format:", response.data);
-                Toast.show({
-                    type: 'error',
-                    text1: 'Error',
-                    text2: 'Failed to load profile data.',
-                });
-                return;
+                throw new Error('Invalid API response format');
             }
 
             setUserId(data.id);
@@ -68,27 +85,42 @@ const EditProfile = () => {
             setDistrict(data.district || '');
             setState(data.state || '');
             setPincode(data.pincode || '');
-            setAddress(data.addresss || '');
+            setAddress(data.addresss || data.address || '');
 
             let profileImage = data?.dp || '';
-            if (typeof profileImage === "number") {
+            if (typeof profileImage === 'number') {
                 profileImage = profileImage.toString();
             }
-            if (profileImage && profileImage !== "null" && profileImage !== "undefined") {
-                profileImage = profileImage.startsWith("http")
+            if (profileImage && profileImage !== 'null' && profileImage !== 'undefined') {
+                profileImage = profileImage.startsWith('http')
                     ? profileImage
                     : `https://carzchoice.com/assets/backend-assets/images/${profileImage}`;
             } else {
                 profileImage = images.avatar;
             }
             setImage(profileImage);
+
+            // Update AsyncStorage with fetched data
+            await AsyncStorage.setItem('userData', JSON.stringify({
+                id: data.id,
+                fullname: data.fullname,
+                email: data.email,
+                contactno: data.contactno,
+                usertype: data.usertype,
+                district: data.district,
+                state: data.state,
+                pincode: data.pincode,
+                addresss: data.addresss || data.address,
+                dp: profileImage,
+            }));
         } catch (error) {
-            console.error("Error fetching profile data:", error);
+            console.error('Error fetching profile data:', error.message, error.response?.data);
             Toast.show({
                 type: 'error',
                 text1: 'Error',
-                text2: 'Failed to load profile data. Please try again.',
+                text2: 'Failed to load profile data. Using local data if available.',
             });
+            // Don't redirect; rely on AsyncStorage defaults
         } finally {
             setLoading(false);
         }
@@ -151,50 +183,70 @@ const EditProfile = () => {
             const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
             if (!permissionResult.granted) {
                 Alert.alert(
-                    "Permission Denied",
-                    "Please allow access to photos to select an image.",
-                    [{ text: "OK" }]
+                    'Permission Denied',
+                    'Please allow access to photos to select an image.',
+                    [{ text: 'OK' }]
                 );
-                setImageUploading(false); // Reset loading state
                 return;
             }
 
             const result = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images, // Use enum for clarity
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
                 allowsEditing: true,
                 aspect: [1, 1],
                 quality: 0.8,
             });
 
-            if (!result.canceled && result.assets && result.assets.length > 0) {
-                setImage(result.assets[0].uri);
+            if (!result.canceled && result.assets?.length > 0) {
+                const imageUri = result.assets[0].uri;
+                // Validate image size (< 2MB)
+                const response = await fetch(imageUri);
+                const blob = await response.blob();
+                if (blob.size > 2 * 1024 * 1024) {
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Invalid Image',
+                        text2: 'Image size must be less than 2MB.',
+                    });
+                    return;
+                }
+                setImage(imageUri);
             } else {
-                console.log("Image selection canceled or failed");
+                console.log('Image selection canceled or failed');
             }
         } catch (error) {
-            console.error("Error picking image:", error);
+            console.error('Error picking image:', error);
             Toast.show({
                 type: 'error',
                 text1: 'Error',
                 text2: 'Failed to pick image. Please try again.',
             });
         } finally {
-            setImageUploading(false); // Always reset loading state
+            setImageUploading(false);
         }
     };
 
     const validateInputs = () => {
-        if (!username.trim()) return "Username is required.";
-        if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Valid email is required.";
-        if (!phoneNumber.trim() || !/^\d{10}$/.test(phoneNumber)) return "Valid 10-digit phone number is required.";
-        if (!district.trim()) return "District is required.";
-        if (!state.trim()) return "State is required.";
-        if (!pincode.trim() || !/^\d{6}$/.test(pincode)) return "Valid 6-digit pincode is required.";
-        if (!address.trim()) return "Address is required.";
+        if (!username.trim()) return 'Username is required.';
+        if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'Valid email is required.';
+        if (!phoneNumber.trim() || !/^\d{10}$/.test(phoneNumber)) return 'Valid 10-digit phone number is required.';
+        if (!district.trim()) return 'District is required.';
+        if (!state.trim()) return 'State is required.';
+        if (!pincode.trim() || !/^\d{6}$/.test(pincode)) return 'Valid 6-digit pincode is required.';
+        if (!address.trim()) return 'Address is required.';
         return null;
     };
 
     const handleSubmit = async () => {
+        if (!userId) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'User ID is missing. Please try again.',
+            });
+            return;
+        }
+
         const validationError = validateInputs();
         if (validationError) {
             Toast.show({
@@ -215,16 +267,30 @@ const EditProfile = () => {
             formData.append('pincode', pincode);
             formData.append('state', state);
             formData.append('addresss', address);
+            formData.append('usertype', usertype);
 
             if (image && image.startsWith('file://')) {
+                const fileType = image.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
+                const fileName = `profile.${fileType.split('/')[1]}`;
                 formData.append('dp', {
-                    uri: Platform.OS === 'android' ? image : image.replace('file://', ''),
-                    name: 'profile.jpg',
-                    type: 'image/jpeg',
+                    uri: image,
+                    name: fileName,
+                    type: fileType,
                 });
             }
 
-            console.log("Submitting FormData:", formData);
+            // console.log('Submitting FormData for userId:', userId);
+            // console.log('FormData fields:', {
+            //     fullname: username,
+            //     email,
+            //     contactno: phoneNumber,
+            //     district,
+            //     pincode,
+            //     state,
+            //     addresss: address,
+            //     usertype,
+            //     hasImage: !!image && image.startsWith('file://'),
+            // });
 
             const response = await axios.post(
                 `https://carzchoice.com/api/updateuserprofile/${userId}`,
@@ -234,6 +300,7 @@ const EditProfile = () => {
                         'Content-Type': 'multipart/form-data',
                         'Accept': 'application/json',
                     },
+                    timeout: 10000,
                 }
             );
 
@@ -243,18 +310,59 @@ const EditProfile = () => {
                     text1: 'Success',
                     text2: 'Profile updated successfully!',
                 });
+                // Store all form data in AsyncStorage
+                await AsyncStorage.setItem('userData', JSON.stringify({
+                    id: userId,
+                    fullname: username,
+                    email,
+                    contactno: phoneNumber,
+                    usertype,
+                    district,
+                    state,
+                    pincode,
+                    addresss: address,
+                    dp: image && !image.startsWith('file://') ? image : response.data.userData?.dp || null,
+                }));
                 fetchProfileData();
             } else {
                 throw new Error(response.data.message || 'Unexpected server response.');
             }
         } catch (error) {
-            console.error('Error updating profile:', error.response?.data || error.message);
-            const errorMessage = error.response?.data?.message || 'Could not update profile. Please try again later.';
+            console.error('Error updating profile:', {
+                message: error.message,
+                response: error.response?.data,
+                status: error.response?.status,
+            });
+            const errorMessage =
+                error.response?.data?.message?.includes('Class')
+                    ? 'Image upload failed due to server configuration.'
+                    : error.response?.data?.message ||
+                      (error.message === 'timeout of 10000ms exceeded'
+                          ? 'Request timed out. Please check your network.'
+                          : 'Could not update profile. Please try again.');
+
             Toast.show({
                 type: 'error',
                 text1: 'Update Failed',
-                text2: errorMessage.includes('Class') ? 'Server configuration error. Contact support.' : errorMessage,
+                text2: errorMessage,
             });
+
+            if (error.response?.data?.message?.includes('Class')) {
+                Alert.alert(
+                    'Image Upload Failed',
+                    'The server failed to process the image. Would you like to update without an image?',
+                    [
+                        { text: 'Cancel', style: 'cancel' },
+                        {
+                            text: 'Update Without Image',
+                            onPress: () => {
+                                setImage(null);
+                                handleSubmit();
+                            },
+                        },
+                    ]
+                );
+            }
         } finally {
             setLoading(false);
         }
@@ -448,38 +556,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#F7F9FC',
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: '#E8ECEF',
-    },
-    headerText: {
-        fontSize: 20,
-        fontWeight: '700',
-        color: '#1A1A1A',
-    },
-    backButton: {
-        borderRadius: 12,
-        overflow: 'hidden',
-    },
-    backButtonGradient: {
-        padding: 10,
-        borderRadius: 12,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 2,
-    },
-    icon: {
-        width: 20,
-        height: 20,
-        tintColor: '#1A1A1A',
     },
     loadingContainer: {
         flex: 1,

@@ -115,7 +115,7 @@ const VariantsList = ({ data, headerTitle }) => {
     };
 
     // Render variant item
-    const renderVariant = ({ item }) => (
+    const renderVariant = ({ item, index }) => (
         <TouchableOpacity
             style={styles.variantCard}
             onPress={() => handleCardPress(item.id)}
@@ -123,11 +123,9 @@ const VariantsList = ({ data, headerTitle }) => {
         >
             <View style={styles.variantHeader}>
                 <Text style={styles.variantName} numberOfLines={1}>
-                    {item.name}
+                    {index + 1}. {item.name}
                 </Text>
-                <Text style={styles.variantPrice}>
-                    ₹{item.price} {item.priceType === 'Lakh' ? 'Lakh*' : ''}
-                </Text>
+
             </View>
             <View style={styles.variantSpecsContainer}>
                 <View style={styles.specItem}>
@@ -146,24 +144,31 @@ const VariantsList = ({ data, headerTitle }) => {
                     <Feather name="activity" size={14} color="#6B7280" style={styles.specIcon} />
                     <Text style={styles.variantSpecs}>{item.mileage}</Text>
                 </View>
+
             </View>
-            
-            <TouchableOpacity
-                style={styles.compareContainer}
-                onPress={() => toggleCompare(item)}
-            >
-                <View
-                    style={[
-                        styles.checkbox,
-                        selectedVariants.some((v) => v.id === item.id) && styles.checkboxSelected,
-                    ]}
+            <View className="flex flex-row justify-between">
+                <Text style={styles.variantPrice}>
+                    ₹{item.price} {item.priceType === 'Lakh' ? 'Lakh*' : ''}
+                </Text>
+                <TouchableOpacity
+                    style={styles.compareContainer}
+                    onPress={() => toggleCompare(item)}
                 >
-                    {selectedVariants.some((v) => v.id === item.id) && (
-                        <Feather name="check" size={16} color="#FFFFFF" />
-                    )}
-                </View>
-                <Text style={styles.compareText}>Compare</Text>
-            </TouchableOpacity>
+                    <View
+                        style={[
+                            styles.checkbox,
+                            selectedVariants.some((v) => v.id === item.id) && styles.checkboxSelected,
+                        ]}
+                    >
+                        {selectedVariants.some((v) => v.id === item.id) && (
+                            <Feather name="check" size={16} color="#FFFFFF" />
+                        )}
+                    </View>
+                    <Text style={styles.compareText}>Compare</Text>
+                </TouchableOpacity>
+            </View>
+
+
         </TouchableOpacity>
     );
 
@@ -373,19 +378,19 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     variantName: {
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: '700',
         color: '#1F2937',
         flex: 1,
         letterSpacing: 0.2,
     },
     variantPrice: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: '700',
         color: '#1E3A8A',
     },
     variantSpecsContainer: {
-        marginBottom: 12,
+        marginBottom: 5,
         display: "flex",
         flexDirection: 'row',
         flexWrap: 'wrap',
@@ -433,11 +438,12 @@ const styles = StyleSheet.create({
     },
     compareContainer: {
         flexDirection: 'row',
-        alignItems: 'center',
+        alignItems: 'right',
+        marginStart: 'auto',
         gap: 8,
-        paddingVertical: 8,
-        borderTopWidth: 1,
-        borderTopColor: '#E5E7EB',
+        paddingInline: 8,
+        borderStartWidth: 1,
+        borderStartColor: '#E5E7EB',
     },
     checkbox: {
         width: 20,

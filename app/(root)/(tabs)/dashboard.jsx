@@ -141,7 +141,7 @@ const Dashboard = () => {
             </View>
 
             {/* Settings Section */}
-            <View className="mb-6">
+            <View className="">
               {settings.map((item, index) => (
                 <TouchableOpacity
                   key={index}

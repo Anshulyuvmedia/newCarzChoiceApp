@@ -357,28 +357,23 @@ const carInsurance = () => {
 
     return (
         <View style={styles.container}>
+            {/* Header */}
             <LinearGradient
-                colors={['#F7F9FC', '#E8ECEF']}
-                style={styles.header}
+                colors={['#0061ff', '#003087']}
+                className="p-3 px-5 mb-4 flex-row items-center justify-between"
             >
-                <Text style={styles.headerText} className="capitalize font-rubik-bold">
-                    Car Insurance
-                </Text>
+                <Text className="text-xl font-rubik-bold text-white">Car Insurance</Text>
                 <TouchableOpacity
-                    onPress={() => router.push('/dashboard')}
-                    style={styles.backButton}
-                    activeOpacity={0.7}
+                    onPress={() => router.back()}
+                    className="bg-white/80 p-2 rounded-lg"
+                    accessibilityLabel="Go back"
                 >
-                    <LinearGradient
-                        colors={['#FFFFFF', '#E8ECEF']}
-                        style={styles.backButtonGradient}
-                    >
-                        <Image source={icons.backArrow} style={styles.icon} />
-                    </LinearGradient>
+                    <Image source={icons.backArrow} className="w-6 h-6 tint-white" />
                 </TouchableOpacity>
             </LinearGradient>
-            <Toast config={toastConfig} position="top" />
-
+            <View style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 9999 }}>
+                <Toast config={toastConfig} position="top" />
+            </View>
             {loading ? (
                 <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color="#0061FF" />
@@ -590,7 +585,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     formContainer: {
-        marginTop: 10,
+        marginTop: 0,
     },
     inputGroup: {
         marginBottom: 16,
