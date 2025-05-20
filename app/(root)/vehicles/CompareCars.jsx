@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity, ScrollView, StyleSheet, Platform }
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import icons from "@/constants/icons";
+import { LinearGradient } from 'expo-linear-gradient';
 
 const CompareScreen = () => {
     const router = useRouter();
@@ -278,9 +279,15 @@ const CompareScreen = () => {
                 <Text style={styles.headerTitle}>Compare Vehicles</Text>
                 <TouchableOpacity
                     onPress={() => router.back()}
-                    activeOpacity={0.8}
+                    style={styles.backButton}
+                    activeOpacity={0.7}
                 >
-                    <Text style={styles.closeText}>Close</Text>
+                    <LinearGradient
+                        colors={['#FFFFFF', '#E8ECEF']}
+                        style={styles.backButtonGradient}
+                    >
+                        <Image source={icons.backArrow} style={styles.icon} />
+                    </LinearGradient>
                 </TouchableOpacity>
             </View>
 
@@ -506,6 +513,24 @@ const CompareScreen = () => {
 };
 
 const styles = StyleSheet.create({
+    backButton: {
+        borderRadius: 12,
+        overflow: 'hidden',
+    },
+    backButtonGradient: {
+        padding: 10,
+        borderRadius: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    icon: {
+        width: 20,
+        height: 20,
+        tintColor: '#1A1A1A',
+    },
     container: {
         flex: 1,
         backgroundColor: '#F3F4F6', // bg-gray-50
@@ -763,7 +788,7 @@ const styles = StyleSheet.create({
     },
     highlightedRow: {
         backgroundColor: '#e8ffe6', // bg-yellow-100
-        
+
     },
     loadingContainer: {
         flex: 1,

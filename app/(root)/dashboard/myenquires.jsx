@@ -4,6 +4,7 @@ import { Link, useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import icons from '@/constants/icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const MyEnquires = () => {
     const [userLeadData, setUserLeadData] = useState([]);
@@ -22,7 +23,7 @@ const MyEnquires = () => {
             // console.log('API Response:', response.data.data); // Log the API response
             if (response.data && response.data.data) {
                 const formattedData = response.data.data.map((item) => {
-
+                    console.log('item:',item);
                     return {
                         id: item.carid,
                         carname: item.vehicle,
@@ -63,15 +64,23 @@ const MyEnquires = () => {
     };
 
     return (
-        <View className="bg-white flex-1 px-4 pb-20 ">
-            <View className="flex-row items-center ml-2 justify-between">
-                <Text className="text-lg mr-2 text-center font-rubik-bold text-black">My Enquires</Text>
-                <TouchableOpacity onPress={() => router.back()} className="flex-row rounded-full w-11 h-11 items-center justify-center">
-                    <Image source={icons.backArrow} className="w-5 h-5" />
+        <View className="bg-white flex-1  pb-20 ">
+            {/* Header */}
+            <LinearGradient
+                colors={['#0061ff', '#003087']}
+                className="p-3 px-5 flex-row items-center justify-between"
+            >
+                <Text className="text-xl font-rubik-bold text-white">My Enquires</Text>
+                <TouchableOpacity
+                    onPress={() => router.back()}
+                    className="bg-white/80 p-2 rounded-lg"
+                    accessibilityLabel="Go back"
+                >
+                    <Image source={icons.backArrow} className="w-6 h-6 tint-white" />
                 </TouchableOpacity>
-            </View>
+            </LinearGradient>
 
-            <View className="mt-6 mb-12">
+            <View className="mt-6 mb-12 px-4">
                 {loading ? (
                     <View>
                         <ActivityIndicator size="large" color="#0061ff" style={{ marginTop: 300 }} />
@@ -145,4 +154,23 @@ const MyEnquires = () => {
 
 export default MyEnquires;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+    backButton: {
+        borderRadius: 12,
+        overflow: 'hidden',
+    },
+    backButtonGradient: {
+        padding: 10,
+        borderRadius: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    icon: {
+        width: 20,
+        height: 20,
+        tintColor: '#1A1A1A',
+    },
+});

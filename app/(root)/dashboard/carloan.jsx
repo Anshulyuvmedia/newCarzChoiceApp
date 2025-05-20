@@ -8,6 +8,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import CitySelector from '../../../components/CitySelector';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const CarLoan = () => {
     const [loading, setLoading] = useState(false);
@@ -250,15 +251,21 @@ const CarLoan = () => {
 
     return (
         <View style={{ flex: 1 }}>
-
+            {/* Header */}
+            <LinearGradient
+                colors={['#0061ff', '#003087']}
+                className="p-3 px-5 mb-4 flex-row items-center justify-between"
+            >
+                <Text className="text-xl font-rubik-bold text-white">Get Car Loan</Text>
+                <TouchableOpacity
+                    onPress={() => router.back()}
+                    className="bg-white/80 p-2 rounded-lg"
+                    accessibilityLabel="Go back"
+                >
+                    <Image source={icons.backArrow} className="w-6 h-6 tint-white" />
+                </TouchableOpacity>
+            </LinearGradient>
             <View style={{ flex: 1, paddingHorizontal: 20 }}>
-                <View className="flex flex-row items-center justify-between my-5">
-                    <Text className="text-xl font-rubik-bold upper">Get Car Loan</Text>
-
-                    <TouchableOpacity onPress={() => router.back()} className="flex-row bg-gray-300 rounded-full w-11 h-11 items-center justify-center">
-                        <Image source={icons.backArrow} className="w-5 h-5" />
-                    </TouchableOpacity>
-                </View>
                 {loading ? (
                     <ActivityIndicator size="large" color="#0061ff" style={{ marginTop: 400 }} />
                 ) : (
@@ -270,28 +277,8 @@ const CarLoan = () => {
 
 
                             <Text className="text-2xl font-rubik-bold">Looking for a Car Loan?</Text>
-                            <Text className="text-base font-rubik-medium">Please provide your details so our insurance partner can reach out to you about your inquiry.</Text>
+                            <Text className="text-base font-rubik">Please provide your details so our insurance partner can reach out to you about your inquiry.</Text>
 
-                            <View>
-                                <Text className="text-lg font-rubik-bold">Our Lending Partners</Text>
-                                <View className="flex flex-row flex-wrap justify-between mt-5 ">
-                                    {[
-                                        { image: images.axisbank, name: "Axis Bank" },
-                                        { image: images.hdbbank, name: "HDB Financial Services" },
-                                        { image: images.icicibank, name: "ICICI Bank" },
-                                        { image: images.idfcbank, name: "IDFC First Bank" },
-                                        { image: images.tvscredit, name: "TVS Credit Finance" },
-                                        { image: images.yesbank, name: "Yes Bank" }
-                                    ].map((bank, index) => (
-                                        <View key={index} className="w-1/2 px-2 mb-4">
-                                            <View className="bg-white shadow-lg rounded-lg p-3 flex items-center">
-                                                <Image source={bank.image} className="w-32 h-20" style={{ resizeMode: 'contain' }} />
-                                                <Text className="text-sm font-rubik-medium text-center">{bank.name}</Text>
-                                            </View>
-                                        </View>
-                                    ))}
-                                </View>
-                            </View>
 
                             <View className="flex mt-5 shadow rounded-lg bg-white p-5">
 
@@ -354,6 +341,27 @@ const CarLoan = () => {
                                 </View>
 
                             </View>
+
+                            <View>
+                                <Text className="text-lg font-rubik-bold mt-3">Our Lending Partners</Text>
+                                <View className="flex flex-row flex-wrap justify-between mt-5 ">
+                                    {[
+                                        { image: images.axisbank, name: "Axis Bank" },
+                                        { image: images.hdbbank, name: "HDB Financial Services" },
+                                        { image: images.icicibank, name: "ICICI Bank" },
+                                        { image: images.idfcbank, name: "IDFC First Bank" },
+                                        { image: images.tvscredit, name: "TVS Credit Finance" },
+                                        { image: images.yesbank, name: "Yes Bank" }
+                                    ].map((bank, index) => (
+                                        <View key={index} className="w-1/2 px-2 mb-4">
+                                            <View className="bg-white shadow-lg rounded-lg p-3 flex items-center">
+                                                <Image source={bank.image} className="w-32 h-20" style={{ resizeMode: 'contain' }} />
+                                                <Text className="text-sm font-rubik-medium text-center">{bank.name}</Text>
+                                            </View>
+                                        </View>
+                                    ))}
+                                </View>
+                            </View>
                         </ScrollView>
 
                         <TouchableOpacity onPress={handleSubmit} style={styles.submitButton} disabled={loading}>
@@ -373,6 +381,24 @@ const CarLoan = () => {
 export default CarLoan
 
 const styles = StyleSheet.create({
+    backButton: {
+        borderRadius: 12,
+        overflow: 'hidden',
+    },
+    backButtonGradient: {
+        padding: 10,
+        borderRadius: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    icon: {
+        width: 20,
+        height: 20,
+        tintColor: '#1A1A1A',
+    },
     label: {
         fontSize: 16,
         marginHorizontal: 5,

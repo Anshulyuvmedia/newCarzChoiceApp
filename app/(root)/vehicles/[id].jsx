@@ -269,7 +269,7 @@ const CarDetails = () => {
             renderLabel={({ route, focused }) => (
                 <Text
                     style={{
-                        color: focused ? '#fff' : '#ccc',
+                        color: focused ? '#ff666f' : '#ccc',
                         fontWeight: 'bold',
                     }}
                 >

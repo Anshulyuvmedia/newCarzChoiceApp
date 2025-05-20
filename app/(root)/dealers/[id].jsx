@@ -8,47 +8,6 @@ import axios from 'axios';
 import { LinearGradient } from 'expo-linear-gradient';
 import { PopularCard } from '@/components/Cards';
 
-// const PopularCard = ({ item, onPress }) => (
-//     <Pressable
-//         onPress={onPress}
-//         style={({ pressed }) => [
-//             styles.carCard,
-//             { opacity: pressed ? 0.7 : 1 },
-//         ]}
-//     >
-//         <LinearGradient
-//             colors={['#ffffff', '#f8fafc']}
-//             style={styles.carCardGradient}
-//         >
-//             <View className="relative">
-//                 <Image
-//                     source={item.thumbnail ? { uri: item.thumbnail } : images.newYork}
-//                     className="w-full h-36 rounded-t-lg"
-//                     resizeMode="cover"
-//                 />
-//                 {item.isNew && (
-//                     <View className="absolute top-2 left-2 bg-green-500 rounded-full px-2 py-1">
-//                         <Text className="text-xs font-semibold text-white">New</Text>
-//                     </View>
-//                 )}
-//             </View>
-//             <View className="p-4">
-//                 <Text className="text-base font-semibold text-gray-900" numberOfLines={1}>
-//                     {item.brandname} {item.carname}
-//                 </Text>
-//                 <Text className="text-sm text-gray-600 mt-1" numberOfLines={1}>
-//                     {item.modalname}
-//                 </Text>
-//                 <View className="flex-row justify-between items-center mt-2">
-//                     <Text className="text-xs font-medium text-gray-500">{item.bodytype || 'N/A'}</Text>
-//                     <Text className="text-sm font-bold text-blue-600">{item.price}</Text>
-//                 </View>
-//                 <Text className="text-xs text-gray-400 mt-1">Year: {item.manufactureyear || 'N/A'}</Text>
-//             </View>
-//         </LinearGradient>
-//     </Pressable>
-// );
-
 const DealerDetails = () => {
     const toastConfig = {
         success: (props) => (
@@ -238,15 +197,21 @@ const DealerDetails = () => {
             <View style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 9999 }}>
                 <Toast config={toastConfig} position="top" />
             </View>
-            <View className="flex-row justify-between items-center my-6 px-5">
-                <Text className="text-2xl font-bold text-gray-900">Dealer Profile</Text>
+            {/* Header */}
+            <LinearGradient
+                colors={['#0061ff', '#003087']}
+                className="p-3 px-5 mb-6 flex-row items-center justify-between"
+            >
+                <Text className="text-xl font-rubik-bold text-white">Dealer Profile</Text>
                 <TouchableOpacity
                     onPress={() => router.back()}
-                    className="bg-white rounded-full w-12 h-12 items-center justify-center shadow-sm"
+                    className="bg-white/80 p-2 rounded-lg"
+                    accessibilityLabel="Go back"
                 >
-                    <Image source={icons.backArrow} className="w-6 h-6" />
+                    <Image source={icons.backArrow} className="w-6 h-6 tint-white" />
                 </TouchableOpacity>
-            </View>
+            </LinearGradient>
+            
             {loading ? (
                 <ActivityIndicator size="large" color="#2563eb" style={{ marginTop: '50%' }} />
             ) : (
@@ -314,6 +279,24 @@ const DealerDetails = () => {
 export default DealerDetails;
 
 const styles = StyleSheet.create({
+    backButton: {
+        borderRadius: 12,
+        overflow: 'hidden',
+    },
+    backButtonGradient: {
+        padding: 10,
+        borderRadius: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    icon: {
+        width: 20,
+        height: 20,
+        tintColor: '#1A1A1A',
+    },
     container: {
         flex: 1,
     },

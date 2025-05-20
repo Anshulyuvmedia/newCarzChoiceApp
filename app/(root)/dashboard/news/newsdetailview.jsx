@@ -5,6 +5,7 @@ import HTML from 'react-native-render-html';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import YoutubePlayer from 'react-native-youtube-iframe';
+import icons from '@/constants/icons';
 
 const { width } = Dimensions.get('window');
 
@@ -58,21 +59,19 @@ const NewsDetailView = () => {
 
     return (
         <ScrollView style={styles.container}>
-            <View style={styles.header}>
-                <Pressable
+            {/* Header */}
+            <LinearGradient
+                colors={['#0061ff', '#003087']}
+                className="p-3 px-5 mb-4 flex-row items-center justify-between"
+            >
+                <TouchableOpacity
                     onPress={() => router.back()}
-                    style={styles.backButton}
+                    className="bg-white/80 p-2 rounded-lg"
                     accessibilityLabel="Go back"
                 >
-                    <LinearGradient
-                        colors={['#ffffff', '#f0f0f0']}
-                        style={styles.backButtonGradient}
-                    >
-                        <Ionicons name="arrow-back" size={24} color="#1a1a1a" />
-                        <Text style={styles.backText}>Back</Text>
-                    </LinearGradient>
-                </Pressable>
-                <Pressable
+                    <Image source={icons.backArrow} className="w-6 h-6 tint-white" />
+                </TouchableOpacity>
+                <TouchableOpacity
                     onPress={handleShare}
                     style={styles.shareButton}
                     accessibilityLabel="Share article"
@@ -83,58 +82,62 @@ const NewsDetailView = () => {
                     >
                         <Ionicons name="share-outline" size={24} color="#1a1a1a" />
                     </LinearGradient>
-                </Pressable>
-            </View>
+                </TouchableOpacity>
+            </LinearGradient>
+            
             {articleData.image && (
-                <View style={styles.imageContainer}>
-                    {imageLoading && (
-                        <View style={styles.imagePlaceholder}>
-                            <ActivityIndicator size="large" color="#0061ff" />
-                        </View>
-                    )}
-                    <Image
-                        source={{ uri: articleData.image }}
-                        style={styles.image}
-                        resizeMode="cover"
-                        onLoad={() => setImageLoading(false)}
-                        onError={() => setImageLoading(false)}
-                    />
-                    <LinearGradient
-                        colors={['transparent', 'rgba(0, 0, 0, 0.3)']}
-                        style={styles.imageGradient}
-                    />
-                </View>
-            )}
+                    <View style={styles.imageContainer}>
+                        {imageLoading && (
+                            <View style={styles.imagePlaceholder}>
+                                <ActivityIndicator size="large" color="#0061ff" />
+                            </View>
+                        )}
+                        <Image
+                            source={{ uri: articleData.image }}
+                            style={styles.image}
+                            resizeMode="cover"
+                            onLoad={() => setImageLoading(false)}
+                            onError={() => setImageLoading(false)}
+                        />
+                        <LinearGradient
+                            colors={['transparent', 'rgba(0, 0, 0, 0.3)']}
+                            style={styles.imageGradient}
+                        />
+                    </View>
+                )
+            }
             <Text style={styles.title}>{articleData.title}</Text>
             <Text style={styles.date}>{articleData.date}</Text>
             <Text style={styles.description}>{articleData.description}</Text>
             {youtubeId && (
-                <View style={styles.videoContainer}>
-                    <YoutubePlayer
-                        height={220}
-                        videoId={youtubeId}
-                        play={playingVideo}
-                        onChangeState={(event) => {
-                            if (event === 'playing') setPlayingVideo(true);
-                            if (event === 'paused' || event === 'ended') setPlayingVideo(false);
+                    <View style={styles.videoContainer}>
+                        <YoutubePlayer
+                            height={220}
+                            videoId={youtubeId}
+                            play={playingVideo}
+                            onChangeState={(event) => {
+                                if (event === 'playing') setPlayingVideo(true);
+                                if (event === 'paused' || event === 'ended') setPlayingVideo(false);
+                            }}
+                        />
+                    </View>
+                )
+            }
+            {articleData.blogpost && (
+                    <HTML
+                        source={{ html: articleData.blogpost }}
+                        contentWidth={width - 40}
+                        tagsStyles={{
+                            p: { fontSize: 16, color: '#1a1a1a', lineHeight: 24, marginVertical: 6, paddingHorizontal: 15 },
+                            strong: { fontWeight: '700' },
+                        }}
+                        baseStyle={{
+                            fontSize: 16,
+                            color: '#1a1a1a',
                         }}
                     />
-                </View>
-            )}
-            {articleData.blogpost && (
-                <HTML
-                    source={{ html: articleData.blogpost }}
-                    contentWidth={width - 40}
-                    tagsStyles={{
-                        p: { fontSize: 16, color: '#1a1a1a', lineHeight: 24, marginVertical: 6, paddingHorizontal: 15 },
-                        strong: { fontWeight: '700' },
-                    }}
-                    baseStyle={{
-                        fontSize: 16,
-                        color: '#1a1a1a',
-                    }}
-                />
-            )}
+                )
+            }
         </ScrollView>
     );
 };

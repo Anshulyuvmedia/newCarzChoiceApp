@@ -146,24 +146,41 @@ const EditProfile = () => {
     };
 
     const pickImage = async () => {
-        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (permissionResult.granted === false) {
-            Alert.alert("Permission Denied", "Please allow access to photos to select an image.");
-            return;
-        }
+        try {
+            setImageUploading(true);
+            const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (!permissionResult.granted) {
+                Alert.alert(
+                    "Permission Denied",
+                    "Please allow access to photos to select an image.",
+                    [{ text: "OK" }]
+                );
+                setImageUploading(false); // Reset loading state
+                return;
+            }
 
-        setImageUploading(true);
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ['image'], // Updated to fix deprecation warning
-            allowsEditing: true,
-            aspect: [1, 1],
-            quality: 0.8,
-        });
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images, // Use enum for clarity
+                allowsEditing: true,
+                aspect: [1, 1],
+                quality: 0.8,
+            });
 
-        if (!result.canceled) {
-            setImage(result.assets[0].uri);
+            if (!result.canceled && result.assets && result.assets.length > 0) {
+                setImage(result.assets[0].uri);
+            } else {
+                console.log("Image selection canceled or failed");
+            }
+        } catch (error) {
+            console.error("Error picking image:", error);
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Failed to pick image. Please try again.',
+            });
+        } finally {
+            setImageUploading(false); // Always reset loading state
         }
-        setImageUploading(false);
     };
 
     const validateInputs = () => {
@@ -245,26 +262,21 @@ const EditProfile = () => {
 
     return (
         <View style={styles.container}>
+            {/* Header */}
             <LinearGradient
-                colors={['#F7F9FC', '#E8ECEF']}
-                style={styles.header}
+                colors={['#0061ff', '#003087']}
+                className="p-3 px-5 flex-row items-center justify-between"
             >
-                <Text style={styles.headerText} className="capitalize font-rubik-bold">
-                    Edit {usertype} Profile
-                </Text>
+                <Text className="text-xl font-rubik-bold text-white">Edit {usertype} Profile</Text>
                 <TouchableOpacity
                     onPress={() => router.back()}
-                    style={styles.backButton}
-                    activeOpacity={0.7}
+                    className="bg-white/80 p-2 rounded-lg"
+                    accessibilityLabel="Go back"
                 >
-                    <LinearGradient
-                        colors={['#FFFFFF', '#E8ECEF']}
-                        style={styles.backButtonGradient}
-                    >
-                        <Image source={icons.backArrow} style={styles.icon} />
-                    </LinearGradient>
+                    <Image source={icons.backArrow} className="w-6 h-6 tint-white" />
                 </TouchableOpacity>
             </LinearGradient>
+
             <View style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 9999 }}>
                 <Toast config={toastConfig} position="top" />
             </View>
@@ -435,7 +447,6 @@ export default EditProfile;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        marginTop: 50,
         backgroundColor: '#F7F9FC',
     },
     header: {

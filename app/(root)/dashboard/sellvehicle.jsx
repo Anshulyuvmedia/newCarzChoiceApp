@@ -11,6 +11,7 @@ import 'react-native-get-random-values';
 // import DateTimePicker from '@react-native-community/datetimepicker';
 import Toast, { BaseToast } from 'react-native-toast-message';
 import CitySelector from '../../../components/CitySelector';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const SellVehicle = () => {
 
@@ -466,8 +467,17 @@ const SellVehicle = () => {
                 <Text style={{ fontSize: 16, marginRight: 10, textAlign: 'center', fontFamily: 'Rubik-Medium', color: '#4A4A4A' }}>
                     Sell Your Vehicle
                 </Text>
-                <TouchableOpacity onPress={() => router.back()} style={{ flexDirection: 'row', backgroundColor: '#E0E0E0', borderRadius: 50, width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
-                    <Image source={icons.backArrow} style={{ width: 20, height: 20 }} />
+                <TouchableOpacity
+                    onPress={() => router.back()}
+                    style={styles.backButton}
+                    activeOpacity={0.7}
+                >
+                    <LinearGradient
+                        colors={['#FFFFFF', '#E8ECEF']}
+                        style={styles.backButtonGradient}
+                    >
+                        <Image source={icons.backArrow} style={styles.icon} />
+                    </LinearGradient>
                 </TouchableOpacity>
             </View>
 
@@ -825,6 +835,24 @@ const SellVehicle = () => {
 export default SellVehicle
 
 const styles = StyleSheet.create({
+    backButton: {
+        borderRadius: 12,
+        overflow: 'hidden',
+    },
+    backButtonGradient: {
+        padding: 10,
+        borderRadius: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    icon: {
+        width: 20,
+        height: 20,
+        tintColor: '#1A1A1A',
+    },
     container: {
         flex: 1,
         padding: 0,

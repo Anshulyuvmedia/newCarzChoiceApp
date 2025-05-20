@@ -4,6 +4,7 @@ import { router } from 'expo-router'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import axios from 'axios'
 import icons from '@/constants/icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const Notifications = () => {
     const [notificationData, setNotificationData] = useState([]);
@@ -68,8 +69,17 @@ const Notifications = () => {
         <View className="bg-white h-full px-4">
             {/* Header */}
             <View className="flex-row items-center justify-between mb-3">
-                <TouchableOpacity onPress={() => router.back()} className="flex-row bg-gray-300 rounded-full w-11 h-11 items-center justify-center">
-                    <Image source={icons.backArrow} style={{ width: 20, height: 20 }} />
+                <TouchableOpacity
+                    onPress={() => router.back()}
+                    style={styles.backButton}
+                    activeOpacity={0.7}
+                >
+                    <LinearGradient
+                        colors={['#FFFFFF', '#E8ECEF']}
+                        style={styles.backButtonGradient}
+                    >
+                        <Image source={icons.backArrow} style={styles.icon} />
+                    </LinearGradient>
                 </TouchableOpacity>
                 <Text className="text-lg text-gray-700 font-rubik-bold">Notifications</Text>
                 <TouchableOpacity onPress={markAllAsRead}>
@@ -114,4 +124,23 @@ const Notifications = () => {
 
 export default Notifications;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+    backButton: {
+        borderRadius: 12,
+        overflow: 'hidden',
+    },
+    backButtonGradient: {
+        padding: 10,
+        borderRadius: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    icon: {
+        width: 20,
+        height: 20,
+        tintColor: '#1A1A1A',
+    }
+});

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import axios from 'axios';
 import icons from "@/constants/icons";
+import { LinearGradient } from 'expo-linear-gradient';
 
 const AllBrands = () => {
     const params = useLocalSearchParams();
@@ -102,9 +103,15 @@ const AllBrands = () => {
                 <Text className="text-xl font-rubik-bold text-black">All Brands</Text>
                 <TouchableOpacity
                     onPress={() => router.back()}
-                    className="w-10 h-10 rounded-full bg-gray-200 items-center justify-center"
+                    style={styles.backButton}
+                    activeOpacity={0.7}
                 >
-                    <Image source={icons.backArrow} className="w-4 h-4" />
+                    <LinearGradient
+                        colors={['#FFFFFF', '#E8ECEF']}
+                        style={styles.backButtonGradient}
+                    >
+                        <Image source={icons.backArrow} style={styles.icon} />
+                    </LinearGradient>
                 </TouchableOpacity>
             </View>
 
@@ -146,5 +153,23 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50,
         resizeMode: "contain",
+    },
+    backButton: {
+        borderRadius: 12,
+        overflow: 'hidden',
+    },
+    backButtonGradient: {
+        padding: 10,
+        borderRadius: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    icon: {
+        width: 20,
+        height: 20,
+        tintColor: '#1A1A1A',
     },
 });

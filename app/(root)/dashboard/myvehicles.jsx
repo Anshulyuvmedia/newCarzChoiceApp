@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import images from '@/constants/images';
 import icons from '@/constants/icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const MyVehicles = () => {
   const [userPropertyData, setUserPropertyData] = useState([]);
@@ -78,8 +79,17 @@ const MyVehicles = () => {
     <View className="bg-white flex-1 px-4 pb-20 ">
       <View className="flex-row items-center ml-2 justify-between">
         <Text className="text-lg mr-2 text-center font-rubik text-gray-700">My Vehicles</Text>
-        <TouchableOpacity onPress={() => router.back()} className="flex-row rounded-full w-11 h-11 items-center justify-center">
-          <Image source={icons.backArrow} className="w-5 h-5" />
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+          activeOpacity={0.7}
+        >
+          <LinearGradient
+            colors={['#FFFFFF', '#E8ECEF']}
+            style={styles.backButtonGradient}
+          >
+            <Image source={icons.backArrow} style={styles.icon} />
+          </LinearGradient>
         </TouchableOpacity>
 
       </View>
@@ -187,4 +197,23 @@ const MyVehicles = () => {
 
 export default MyVehicles;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  backButton: {
+        borderRadius: 12,
+        overflow: 'hidden',
+    },
+    backButtonGradient: {
+        padding: 10,
+        borderRadius: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    icon: {
+        width: 20,
+        height: 20,
+        tintColor: '#1A1A1A',
+    },
+});

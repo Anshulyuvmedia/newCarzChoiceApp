@@ -1,4 +1,4 @@
-import { View, Text, Image, TouchableOpacity, FlatList, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, Image, TouchableOpacity, FlatList, ActivityIndicator, RefreshControl, StyleSheet } from 'react-native';
 import { useState, useEffect, useContext } from 'react';
 import { useLocalSearchParams, router } from 'expo-router';
 import axios from 'axios';
@@ -11,6 +11,7 @@ import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import Toast from 'react-native-toast-message';
 import * as Haptics from 'expo-haptics';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const Explore = () => {
     const { currentCity } = useContext(LocationContext);
@@ -108,7 +109,7 @@ const Explore = () => {
     const onRefresh = async () => {
         setRefreshing(true);
         await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-        
+
         // Reset animation
         opacity.value = 0;
         opacity.value = withTiming(1, { duration: 1000 });
@@ -129,21 +130,27 @@ const Explore = () => {
     const visibleCars = Array.isArray(listingData) ? listingData.slice(0, visibleCount) : [];
 
     return (
-        <View className="bg-white flex-1">
+        <View className="bg-white flex-1 ">
+            {/* Header */}
+            <LinearGradient
+                colors={['#0061ff', '#003087']}
+                className="p-3 px-5 mb-4 flex-row items-center justify-between"
+            >
+                <Text className="text-xl font-rubik-bold text-white">Search for Your Dream Car</Text>
+                <TouchableOpacity
+                    onPress={() => router.back()}
+                    className="bg-white/80 p-2 rounded-lg"
+                    accessibilityLabel="Go back"
+                >
+                    <Image source={icons.backArrow} className="w-6 h-6 tint-white" />
+                </TouchableOpacity>
+            </LinearGradient>
+            
+            <View className="min-h-[60px]">
+                <Search selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters} />
+            </View>
+
             <View className="px-5">
-                <View className="flex flex-row items-center ml-2 mb-3 justify-between">
-                    <Text className="text-base mr-2 text-center font-rubik-medium text-black-300">
-                        Search for Your Dream Car
-                    </Text>
-                    <TouchableOpacity onPress={() => router.navigate('/')} className="flex flex-row bg-primary-200 rounded-full size-11 items-center justify-center">
-                        <Image source={icons.backArrow} className="size-5" />
-                    </TouchableOpacity>
-                </View>
-
-                <View className="min-h-[60px]">
-                    <Search selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters} />
-                </View>
-
                 <View className="mt-3">
                     <Text className="text-xl font-rubik-bold text-black-300 capitalize">
                         {listingData.length > 0
@@ -191,7 +198,7 @@ const Explore = () => {
                             loadingMore && <ActivityIndicator size="small" color="#0061ff" style={{ marginVertical: 10 }} />
                         }
                         contentContainerStyle={{
-                            paddingBottom: insets.bottom + tabBarHeight + 80,
+                            paddingBottom: insets.bottom + tabBarHeight + 220,
                             paddingTop: 10,
                         }}
                         columnWrapperStyle={{ flex: 1, gap: 5, paddingHorizontal: 5 }}
@@ -206,3 +213,24 @@ const Explore = () => {
 };
 
 export default Explore;
+
+const styles = StyleSheet.create({
+    backButton: {
+        borderRadius: 12,
+        overflow: 'hidden',
+    },
+    backButtonGradient: {
+        padding: 10,
+        borderRadius: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    icon: {
+        width: 20,
+        height: 20,
+        tintColor: '#1A1A1A',
+    }
+});

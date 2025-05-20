@@ -7,6 +7,7 @@ import icons from '@/constants/icons';
 import { LocationContext } from '@/components/LocationContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import SearchDealer from '@/components/SearchDealer';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const ExploreDealers = () => {
     const { currentCity } = useContext(LocationContext);
@@ -108,27 +109,29 @@ const ExploreDealers = () => {
 
     return (
         <View className="bg-white flex-1">
+            {/* Header */}
+            <LinearGradient
+                colors={['#0061ff', '#003087']}
+                className="p-3 px-5 mb-3 flex-row items-center justify-between"
+            >
+                <Text className="text-xl font-rubik-bold text-white">Search for Car Dealers</Text>
+                <TouchableOpacity
+                    onPress={() => router.back()}
+                    className="bg-white/80 p-2 rounded-lg"
+                    accessibilityLabel="Go back"
+                >
+                    <Image source={icons.backArrow} className="w-6 h-6 tint-white" />
+                </TouchableOpacity>
+            </LinearGradient>
+            <View className="min-h-[60px]">
+                <SearchDealer
+                    selectedFilters={selectedFilters}
+                    setSelectedFilters={setSelectedFilters}
+                    onFiltersApplied={handleFiltersApplied}
+                />
+            </View>
+
             <View className="px-5">
-                <View className="flex flex-row items-center ml-2 mb-3 justify-between">
-                    <Text className="text-base mr-2 text-center font-rubik-medium text-black-300">
-                        Search for Car Dealers
-                    </Text>
-                    <TouchableOpacity
-                        onPress={() => router.navigate('/')}
-                        className="flex flex-row bg-primary-200 rounded-full size-11 items-center justify-center"
-                    >
-                        <Image source={icons.backArrow} className="size-5" />
-                    </TouchableOpacity>
-                </View>
-
-                <View className="min-h-[60px]">
-                    <SearchDealer
-                        selectedFilters={selectedFilters}
-                        setSelectedFilters={setSelectedFilters}
-                        onFiltersApplied={handleFiltersApplied}
-                    />
-                </View>
-
                 <View className="mt-3">
                     <Text className="text-xl font-rubik-bold text-black-300 capitalize">
                         {listingData.length > 0

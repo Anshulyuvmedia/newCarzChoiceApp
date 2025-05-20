@@ -9,6 +9,7 @@ import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
 import { MultiSelect } from 'react-native-element-dropdown';
 import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const RegisterDealer = () => {
     const [loading, setLoading] = useState(false);
@@ -392,19 +393,23 @@ const RegisterDealer = () => {
             {loading ? (
                 <ActivityIndicator size="large" color="#0061ff" style={{ marginTop: 400 }} />
             ) : (
-                <View className="px-5 flex-1">
-                    <View className="flex flex-row items-center justify-between my-5">
-                        <Text className="text-xl font-rubik-bold upper">Become a Dealer</Text>
-                        <View style={{ position: 'absolute', top: 5, left: 0, right: 0, zIndex: 9999 }}>
-                            <Toast config={toastConfig} position="top" />
-                        </View>
-                        <TouchableOpacity onPress={() => router.back()} className="flex-row bg-gray-300 rounded-full w-11 h-11 items-center justify-center">
-                            <Image source={icons.backArrow} className="w-5 h-5" />
+                <View className=" flex-1">
+                    {/* Header */}
+                    <LinearGradient
+                        colors={['#0061ff', '#003087']}
+                        className="p-3 px-5 mb-6 flex-row items-center justify-between"
+                    >
+                        <Text className="text-xl font-rubik-bold text-white">Become a Dealer</Text>
+                        <TouchableOpacity
+                            onPress={() => router.back()}
+                            className="bg-white/80 p-2 rounded-lg"
+                            accessibilityLabel="Go back"
+                        >
+                            <Image source={icons.backArrow} className="w-6 h-6 tint-white" />
                         </TouchableOpacity>
-                    </View>
-                    <ScrollView showsVerticalScrollIndicator={false} >
-
-
+                    </LinearGradient>
+                    
+                    <ScrollView showsVerticalScrollIndicator={false} className="px-5" >
 
                         <Text className="text-2xl font-rubik-bold">Register yourself as a dealer</Text>
 
@@ -598,6 +603,24 @@ const RegisterDealer = () => {
 export default RegisterDealer
 
 const styles = StyleSheet.create({
+    backButton: {
+        borderRadius: 12,
+        overflow: 'hidden',
+    },
+    backButtonGradient: {
+        padding: 10,
+        borderRadius: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    icon: {
+        width: 20,
+        height: 20,
+        tintColor: '#1A1A1A',
+    },
     label: {
         fontSize: 16,
         marginHorizontal: 5,
@@ -687,6 +710,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         alignItems: 'center',
         marginVertical: 20,
+        marginInline: 10,
     },
     image: {
         width: 100,

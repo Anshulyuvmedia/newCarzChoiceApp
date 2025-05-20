@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Image, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import images from '@/constants/images';
 import icons from '@/constants/icons';
@@ -7,37 +7,29 @@ import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import Toast, { BaseToast } from 'react-native-toast-message';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const Dashboard = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [image, setImage] = useState(images.avatar);
+
   const toastConfig = {
     success: (props) => (
       <BaseToast
         {...props}
-        style={{ borderLeftColor: "green" }}
-        text1Style={{
-          fontSize: 16,
-          fontWeight: "bold",
-        }}
-        text2Style={{
-          fontSize: 14,
-        }}
+        style={{ borderLeftColor: 'green' }}
+        text1Style={{ fontSize: 16, fontWeight: 'bold' }}
+        text2Style={{ fontSize: 14 }}
       />
     ),
     error: (props) => (
       <BaseToast
         {...props}
-        style={{ borderLeftColor: "red" }}
-        text1Style={{
-          fontSize: 16,
-          fontWeight: "bold",
-        }}
-        text2Style={{
-          fontSize: 14,
-        }}
+        style={{ borderLeftColor: 'red' }}
+        text1Style={{ fontSize: 16, fontWeight: 'bold' }}
+        text2Style={{ fontSize: 14 }}
       />
     ),
   };
@@ -54,14 +46,10 @@ const Dashboard = () => {
         return;
       }
 
-      // Fetch user data from API
       const response = await axios.get(`https://carzchoice.com/api/userprofile/${parsedUserData.id}`);
-
-      if (response.data && Array.isArray(response.data.userData) && response.data.userData.length > 0) {
+      if (response.data?.userData?.length > 0) {
         const apiUserData = response.data.userData[0];
         setUserData(apiUserData);
-
-        // Set Profile Image, ensuring fallback to default avatar
         setImage(
           apiUserData.dp
             ? apiUserData.dp.startsWith('http')
@@ -85,127 +73,147 @@ const Dashboard = () => {
     fetchUserData();
   }, []);
 
-
-
   return (
-    <View>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="pb-32 px-7">
+    <View className="flex-1 bg-gray-100">
+      <View className="absolute top-0 left-0 right-0 z-50">
+        <Toast config={toastConfig} position="top" />
+      </View>
+
+      {/* Header */}
+      <LinearGradient
+        colors={['#0061ff', '#003087']}
+        className="p-3 px-5 flex-row items-center justify-between"
+      >
+        <Text className="text-xl font-rubik-bold text-white">My Account</Text>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          className="bg-white/80 p-2 rounded-lg"
+          accessibilityLabel="Go back"
+        >
+          <Image source={icons.backArrow} className="w-6 h-6 tint-white" />
+        </TouchableOpacity>
+      </LinearGradient>
+
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerClassName="pb-32 px-5"
+      >
         {loading ? (
-          <ActivityIndicator size="large" color="#0061ff" style={{ marginTop: 400 }} />
+          <View className="flex-1 justify-center items-center mt-40">
+            <ActivityIndicator size="large" color="#0061ff" />
+            <Text className="text-gray-600 font-rubik-regular mt-4">Loading profile...</Text>
+          </View>
         ) : (
-          <View>
-            <View style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 9999 }}>
-              <Toast config={toastConfig} position="top" />
-            </View>
-            <View className="flex flex-row items-center justify-between my-5">
-              <Text className="text-xl font-rubik-bold upper">My Account</Text>
-
-              <TouchableOpacity onPress={() => router.back()} className="flex-row bg-gray-300 rounded-full w-11 h-11 items-center justify-center">
-                <Image source={icons.backArrow} className="w-5 h-5" />
-              </TouchableOpacity>
-            </View>
-            <View className="flex flex-row items-center justify-start shadow bg-white rounded-2xl px-3">
-              <Image
-                source={typeof image === 'string' ? { uri: image } : image}
-                className="size-12 rounded-full"
-              />
-              <View className="flex flex-col items-start ml-2 justify-center">
-                {userData && (
-                  <View className="bg-white p-4 rounded-lg shadow-sm">
-                    <Text className="text-2xl font-rubik-bold text-primary-300 capitalize">
-                      {userData?.fullname || 'User'}
-                    </Text>
-
-                    <Text className="text-black text-base mb-2">
-                      Email: <Text className="font-medium">{userData.email || 'N/A'}</Text>
-                    </Text>
-                    <View className="flex-row items-start justify-between">
-                      <View>
-                        <Text className="text-black text-base mb-1">
-                          Mobile: <Text className="font-medium">{userData.contactno || 'N/A'}</Text>
-                        </Text>
-                        <Text className="text-black text-base capitalize">
-                          Role: <Text className="font-medium">{userData.usertype || 'N/A'}</Text>
-                        </Text>
-                      </View>
-
-                      <TouchableOpacity
-                        onPress={() => router.push('/dashboard/editprofile')}
-                        className="bg-primary-200 px-4 py-2 rounded-lg self-end ms-10"
-                      >
-                        <Text className="text-primary-300 text-base font-rubik-medium">
-                          Edit Profile
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-
-                )}
+          <View className="mt-6">
+            {/* Profile Card */}
+            <View className="bg-white rounded-2xl p-5 shadow-sm mb-6">
+              <View className="flex-row items-center">
+                <Image
+                  source={typeof image === 'string' ? { uri: image } : image}
+                  className="w-16 h-16 rounded-full border-2 border-gray-200"
+                />
+                <View className="ml-4 flex-1">
+                  <Text className="text-xl font-rubik-bold text-gray-800 capitalize">
+                    {userData?.fullname || 'User'}
+                  </Text>
+                  <Text className="text-gray-600 font-rubik-regular mt-1">
+                    {userData?.email || 'N/A'}
+                  </Text>
+                </View>
+              </View>
+              <View className="mt-4 flex-row justify-between items-center">
+                <View>
+                  <Text className="text-gray-600 font-rubik-regular">
+                    Mobile: <Text className="font-rubik-medium">{userData?.contactno || 'N/A'}</Text>
+                  </Text>
+                  <Text className="text-gray-600 font-rubik-regular mt-1 capitalize">
+                    Role: <Text className="font-rubik-medium">{userData?.usertype || 'N/A'}</Text>
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  onPress={() => router.push('/dashboard/editprofile')}
+                  className="bg-blue-500 px-4 py-2 rounded-lg"
+                  accessibilityLabel="Edit profile"
+                >
+                  <Text className="text-white font-rubik-medium">Edit Profile</Text>
+                </TouchableOpacity>
               </View>
             </View>
 
-
-            <View className="flex flex-col mt-5 border-primary-200">
+            {/* Settings Section */}
+            <View className="mb-6">
               {settings.map((item, index) => (
-                <TouchableOpacity key={index} onPress={() => router.push(item.onPress)} className="flex flex-row justify-between items-center py-2 border border-gray-300 mb-2 rounded-2xl ps-4 bg-white">
-                  <View className="flex flex-row items-center">
-                    <Image source={item.icon} className="size-6" />
-                    <View>
-                      <Text className="text-lg font-rubik-medium text-black-300 ml-3">{item.title}</Text>
-                      <Text className="text-sm font-rubik text-gray-700 ml-3">{item.subtitle}</Text>
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => router.push(item.onPress)}
+                  className="flex-row items-center justify-between bg-white rounded-2xl p-4 mb-3 shadow-sm active:opacity-70"
+                  accessibilityLabel={item.title}
+                >
+                  <View className="flex-row items-center">
+                    <Image source={item.icon} className="w-6 h-6" />
+                    <View className="ml-3">
+                      <Text className="text-lg font-rubik-medium text-gray-800">{item.title}</Text>
+                      <Text className="text-sm font-rubik-regular text-gray-500">{item.subtitle}</Text>
                     </View>
                   </View>
-                  <View className="me-3">
-                    <Image source={icons.rightArrow} className="size-6 ms-auto" />
-                  </View>
+                  <Image source={icons.rightArrow} className="w-5 h-5 tint-gray-400" />
                 </TouchableOpacity>
               ))}
             </View>
 
-            <View className="flex flex-col mt-5">
+            {/* Additional Actions */}
+            <View>
               <TouchableOpacity
                 onPress={() => router.push('/dashboard/registerdealer')}
-                className="flex flex-row items-center justify-between py-2 border border-gray-300 mb-2 rounded-2xl ps-4 bg-white "
+                className="flex-row items-center justify-between bg-white rounded-2xl p-4 mb-3 shadow-sm active:opacity-70"
+                accessibilityLabel="Become a dealer"
               >
-                <View className="flex flex-row items-center">
-                  <Image source={icons.person} className="size-6" />
-                  <View>
-                    <Text className="text-lg font-rubik-medium text-black-300 ml-3">Become A Dealer</Text>
-                    <Text className="text-sm font-rubik text-gray-700 ml-3">Sell Car of Multiple Brands</Text>
+                <View className="flex-row items-center">
+                  <Image source={icons.person} className="w-6 h-6" />
+                  <View className="ml-3">
+                    <Text className="text-lg font-rubik-medium text-gray-800">Become A Dealer</Text>
+                    <Text className="text-sm font-rubik-regular text-gray-500">
+                      Sell Car of Multiple Brands
+                    </Text>
                   </View>
                 </View>
-                <View className="me-3">
-                  <Image source={icons.rightArrow} className="size-6 ms-auto" />
-                </View>
+                <Image source={icons.rightArrow} className="w-5 h-5 tint-gray-400" />
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => router.push('./allnews')} className="flex flex-row items-center justify-between py-2 border border-gray-300 mb-2 rounded-2xl ps-4 bg-white">
-                <View className="flex flex-row items-center">
-                  <Image source={icons.newspaper} className="size-8 backgroundColor: blue" />
-                  <View>
-                    <Text className="text-lg font-rubik-medium text-black-300 ml-3">News</Text>
-                    <Text className="text-sm font-rubik text-gray-700 ml-3">All Car News & Expert Reviews</Text>
+              <TouchableOpacity
+                onPress={() => router.push('./allnews')}
+                className="flex-row items-center justify-between bg-white rounded-2xl p-4 mb-3 shadow-sm active:opacity-70"
+                accessibilityLabel="View news"
+              >
+                <View className="flex-row items-center">
+                  <Image source={icons.newspaper} className="w-6 h-6" />
+                  <View className="ml-3">
+                    <Text className="text-lg font-rubik-medium text-gray-800">News</Text>
+                    <Text className="text-sm font-rubik-regular text-gray-500">
+                      All Car News & Expert Reviews
+                    </Text>
                   </View>
                 </View>
-                <View className="me-3">
-                  <Image source={icons.rightArrow} className="size-6 ms-auto" />
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => router.push('/dashboard/support')} className="flex flex-row justify-between items-center py-2 border border-gray-300 mb-2 rounded-2xl ps-4 bg-white">
-                <View className="flex flex-row items-center">
-                  <Image source={icons.customersupport} className="size-8 backgroundColor: blue" />
-                  <View>
-                    <Text className="text-lg font-rubik-medium text-black-300 ml-3">Help & Support</Text>
-                    <Text className="text-sm font-rubik text-gray-700 ml-3">Help Center & Legal terms</Text>
-                  </View>
-                </View>
-                <View className="me-3">
-                  <Image source={icons.rightArrow} className="size-6 ms-auto" />
-                </View>
+                <Image source={icons.rightArrow} className="w-5 h-5 tint-gray-400" />
               </TouchableOpacity>
 
+              <TouchableOpacity
+                onPress={() => router.push('/dashboard/support')}
+                className="flex-row items-center justify-between bg-white rounded-2xl p-4 mb-3 shadow-sm active:opacity-70"
+                accessibilityLabel="Help and support"
+              >
+                <View className="flex-row items-center">
+                  <Image source={icons.customersupport} className="w-6 h-6" />
+                  <View className="ml-3">
+                    <Text className="text-lg font-rubik-medium text-gray-800">Help & Support</Text>
+                    <Text className="text-sm font-rubik-regular text-gray-500">
+                      Help Center & Legal terms
+                    </Text>
+                  </View>
+                </View>
+                <Image source={icons.rightArrow} className="w-5 h-5 tint-gray-400" />
+              </TouchableOpacity>
             </View>
-
           </View>
         )}
       </ScrollView>
