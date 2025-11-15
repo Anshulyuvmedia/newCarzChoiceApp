@@ -136,10 +136,9 @@ const Signin = () => {
           <TouchableOpacity onPress={emaillogin} style={styles.loginButton} disabled={loading}>
             {loading ? <ActivityIndicator size="small" color="#FFF" /> : <Text style={styles.loginButtonText}>Login</Text>}
           </TouchableOpacity>
-
-          <Link href="/signup" style={styles.registerLink}>
-            <Text style={styles.registerText}>Don't have an account? <Text style={styles.highlight}>Register now</Text></Text>
-          </Link>
+          <TouchableOpacity onPress={() => router.push('/signup')} style={styles.registerLink}>
+              <Text style={styles.registerText}>Don't have an account? <Text style={styles.highlight}>Register now</Text></Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
       <View style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 9999 }}>
@@ -157,7 +156,7 @@ const styles = StyleSheet.create({
   logo: { width: '100%', height: '15%' },
   formContainer: { paddingHorizontal: 40, width: '100%', alignItems: 'center' },
   title: { fontSize: 24, textAlign: 'center', fontFamily: 'Rubik-Bold', color: '#333', marginTop: 10 },
-  highlight: { color: '#0061ff' },
+  highlight: { color: '#0061ff', fontWeight: 700 },
   subtitle: { fontSize: 18, fontFamily: 'Rubik-Regular', color: '#555', textAlign: 'center', marginVertical: 15 },
   input: { height: 45, borderColor: '#ccc', borderWidth: 2, borderRadius: 50, paddingHorizontal: 10, marginBottom: 10, width: '100%' },
   loginButton: { backgroundColor: '#0061ff', borderRadius: 25, paddingVertical: 7, alignItems: 'center', marginTop: 10, width: '100%' },
