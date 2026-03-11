@@ -166,7 +166,7 @@ const Signup = () => {
           <Text style={styles.subheading}>Register As {isUser ? 'User' : 'Dealer'}</Text>
 
           <Text style={styles.label}>Full Name</Text>
-          <TextInput style={styles.input} placeholder="Enter Full Name" value={username} onChangeText={setUsername} />
+          <TextInput style={styles.input} placeholderTextColor="#888" placeholder="Enter Full Name" value={username} onChangeText={setUsername} />
 
           <View className="flex-row">
             <Text style={styles.label}>Mobile No.</Text>
@@ -177,6 +177,7 @@ const Signup = () => {
             <TextInput
               style={[styles.input, { flex: 1 }]}
               placeholder="10-digit mobile"
+              placeholderTextColor="#888"
               keyboardType="phone-pad"
               maxLength={10}
               value={mobile}
@@ -193,6 +194,7 @@ const Signup = () => {
           <TextInput
             style={styles.input}
             placeholder="Email"
+            placeholderTextColor="#888"
             keyboardType="email-address"
             autoCapitalize="none"
             value={email}
@@ -202,6 +204,7 @@ const Signup = () => {
           <TextInput
             style={styles.input}
             placeholder="Password"
+            placeholderTextColor="#888"
             secureTextEntry
             value={password}
             onChangeText={setPassword}
@@ -255,6 +258,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 6,
     fontFamily: 'Rubik-Regular',
+    color: '#000',
   },
   mobileRow: { flexDirection: 'row', alignItems: 'center' },
   verified: { marginLeft: 8, color: 'green', fontWeight: 'bold' },

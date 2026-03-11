@@ -138,7 +138,7 @@ const Explore = () => {
             >
                 <Text className="text-xl font-rubik-bold text-white">Search for Your Dream Car</Text>
                 <TouchableOpacity
-                    onPress={() => router.back()}
+                    onPress={() => router.push('/')}
                     className="bg-white/80 p-2 rounded-lg"
                     accessibilityLabel="Go back"
                 >

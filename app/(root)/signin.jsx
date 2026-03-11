@@ -130,8 +130,8 @@ const Signin = () => {
           <Text style={styles.title}>Let's Get You Closer To <Text style={styles.highlight}>Your Dream Car</Text></Text>
           <Text style={styles.subtitle}>Login to your account</Text>
 
-          <TextInput style={styles.input} placeholder="Email" keyboardType="email-address" autoCapitalize="none" value={email} onChangeText={setEmail} />
-          <TextInput style={styles.input} placeholder="Password" secureTextEntry value={password} onChangeText={setPassword} />
+          <TextInput style={styles.input} placeholder="Email" placeholderTextColor="#888" keyboardType="email-address" autoCapitalize="none" value={email} onChangeText={setEmail} />
+          <TextInput style={styles.input} placeholder="Password" placeholderTextColor="#888" secureTextEntry value={password} onChangeText={setPassword} />
 
           <TouchableOpacity onPress={emaillogin} style={styles.loginButton} disabled={loading}>
             {loading ? <ActivityIndicator size="small" color="#FFF" /> : <Text style={styles.loginButtonText}>Login</Text>}
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 24, textAlign: 'center', fontFamily: 'Rubik-Bold', color: '#333', marginTop: 10 },
   highlight: { color: '#0061ff', fontWeight: 700 },
   subtitle: { fontSize: 18, fontFamily: 'Rubik-Regular', color: '#555', textAlign: 'center', marginVertical: 15 },
-  input: { height: 45, borderColor: '#ccc', borderWidth: 2, borderRadius: 50, paddingHorizontal: 10, marginBottom: 10, width: '100%' },
+  input: { height: 45, borderColor: '#ccc', borderWidth: 2, borderRadius: 50, paddingHorizontal: 10, marginBottom: 10, width: '100%', color: '#000' },
   loginButton: { backgroundColor: '#0061ff', borderRadius: 25, paddingVertical: 7, alignItems: 'center', marginTop: 10, width: '100%' },
   loginButtonText: { fontSize: 18, fontFamily: 'Rubik-Medium', color: 'white' },
   registerLink: { marginTop: 20, alignItems: 'center' },

@@ -231,7 +231,7 @@ const Search = ({ selectedFilters = {}, setSelectedFilters }) => {
                                 .join(", ")}
                             editable={false}
                             placeholder="Search Vehicle..."
-                            className="text-sm font-rubik-medium text-gray-800 ml-3 flex-1 capitalize"
+                            className="text-sm h-6 font-rubik-medium text-gray-800 ml-3 flex-1 capitalize"
                         />
                     </View>
                     <Image source={icons.filter} className="w-5 h-5" />

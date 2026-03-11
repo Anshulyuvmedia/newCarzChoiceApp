@@ -27,30 +27,37 @@ const BannerSlider = () => {
     const fetchSliderImages = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`https://carzchoice.com/api/fetchSliderImages`);
-            // console.log('API Response:', response.data);
-    
+            const response = await axios.get(
+                "https://carzchoice.com/api/fetchSliderImages"
+            );
+
             if (response.data && response.data.success) {
-                const imageString = response.data.data.mobileimages;
-                const imageArray = imageString.split(','); // split by commas
-                const formattedData = imageArray.map((relativePath) => ({
-                    image: `https://carzchoice.com/${relativePath}`,
-                    title: '',
-                    link: '',
-                }));
-                setSliderData(formattedData);
-                // console.log('Formatted slider data:', formattedData);
+                const imageString = response.data?.data?.mobileimages;
+
+                if (imageString) {
+                    const imageArray = imageString.split(",");
+
+                    const formattedData = imageArray.map((relativePath) => ({
+                        image: `https://carzchoice.com/${relativePath}`,
+                        title: "",
+                        link: "",
+                    }));
+
+                    setSliderData(formattedData);
+                } else {
+                    console.warn("No mobile images found, using fallback.");
+                    setSliderData([]);
+                }
             } else {
-                console.error('Unexpected API response format:', response.data);
+                console.error("Unexpected API response:", response.data);
             }
-    
         } catch (error) {
-            console.error('Error fetching slider data:', error);
+            console.error("Error fetching slider data:", error);
         } finally {
             setLoading(false);
         }
     };
-    
+
 
     useEffect(() => {
         fetchSliderImages();
