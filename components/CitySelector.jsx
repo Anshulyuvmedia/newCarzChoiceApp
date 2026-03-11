@@ -49,6 +49,7 @@ const CitySelector = ({ cityData = [], onSelectCity }) => {
                             style={styles.textInput}
                             editable={false}
                             pointerEvents="none"
+                            placeholderTextColor="#999"
                             placeholder="Search for your city"
                             value={selectedCity}
                         />

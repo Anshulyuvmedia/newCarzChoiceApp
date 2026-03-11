@@ -13,7 +13,7 @@ const FeaturesSheet = ({ features = [] }) => {
     if (!Array.isArray(features) || features.length === 0) {
         return <Text style={{ textAlign: "center", margin: 20 }}>No Features Available</Text>;
     }
-
+    // console.log('features', features);
     const handleOpenSheet = (section, i) => {
         indexRef.current = i;
         setSelectedSection(section);
@@ -41,13 +41,16 @@ const FeaturesSheet = ({ features = [] }) => {
                 {Array.isArray(section?.details) && section.details.length > 0 ? (
                     section.details.map((feature, idx) => (
                         <View key={idx} style={styles.tableRow}>
-                            <Text style={styles.tableCell}>{feature}</Text>
+                            <Text style={styles.tableCell}>{feature.label}</Text>
+
                             <View style={styles.iconContainer}>
-                                <MaterialIcons
-                                    name={feature.toLowerCase().includes("no") ? "close" : "check"}
-                                    size={20}
-                                    color={feature.toLowerCase().includes("no") ? "red" : "green"}
-                                />
+                                {feature.value === 1 ? (
+                                    <MaterialIcons name="check" size={20} color="green" />
+                                ) : feature.value === 0 ? (
+                                    <MaterialIcons name="close" size={20} color="red" />
+                                ) : (
+                                    <Text style={{ fontSize: 12 }}>N/A</Text>
+                                )}
                             </View>
                         </View>
                     ))

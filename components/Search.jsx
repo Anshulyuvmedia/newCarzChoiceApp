@@ -217,7 +217,7 @@ const Search = ({ selectedFilters = {}, setSelectedFilters }) => {
                     colors={["#ffffff", "#f0f0f0"]}
                     style={styles.searchBarGradient}
                 >
-                    <View className="flex-row items-center justify-start flex-1">
+                    <View className="flex-row items-center justify-start flex-1  ">
                         <Image source={icons.search} className="w-6 h-6" />
                         <TextInput
                             value={[
@@ -231,7 +231,8 @@ const Search = ({ selectedFilters = {}, setSelectedFilters }) => {
                                 .join(", ")}
                             editable={false}
                             placeholder="Search Vehicle..."
-                            className="text-sm h-6 font-rubik-medium text-gray-800 ml-3 flex-1 capitalize"
+                            placeholderTextColor="#888"
+                            className="text-sm h-6 py-0 font-rubik-medium text-gray-800 ml-3 flex-1 capitalize"
                         />
                     </View>
                     <Image source={icons.filter} className="w-5 h-5" />
@@ -280,273 +281,273 @@ const Search = ({ selectedFilters = {}, setSelectedFilters }) => {
                                     style={styles.headerButtonGradient}
                                 >
                                     <Text className="text-sm font-rubik-medium text-gray-800">
-                                    Reset
-                                </Text>
-                            </LinearGradient>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={() => refRBSheet.current.close()}
-                            style={[styles.headerButton, { marginLeft: 10 }]}
-                            accessibilityLabel="Close filter sheet"
-                        >
-                            <LinearGradient
-                                colors={["#ff4444", "#cc0000"]}
-                                style={styles.headerButtonGradient}
+                                        Reset
+                                    </Text>
+                                </LinearGradient>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => refRBSheet.current.close()}
+                                style={[styles.headerButton, { marginLeft: 10 }]}
+                                accessibilityLabel="Close filter sheet"
                             >
-                                <Text className="text-sm font-rubik-medium text-white">
-                                    Close
-                                </Text>
-                            </LinearGradient>
-                        </TouchableOpacity>
-                    </View>
-                </LinearGradient>
-
-                <Text className="text-lg font-rubik-bold text-gray-800 mt-5 mx-4">
-                    Search by Brand
-                </Text>
-                {brands.length > 0 ? (
-                    <FlatList
-                        data={brands}
-                        horizontal={true}
-                        showsHorizontalScrollIndicator={false}
-                        keyExtractor={(item) => `brand-${item.id}`}
-                        keyboardShouldPersistTaps="handled"
-                        style={{ marginTop: 10, marginStart: 10 }}
-                        renderItem={({ item }) => (
-                            <FilterChip
-                                item={item}
-                                isSelected={tempFilters.brand === item.label}
-                                onPress={() =>
-                                    setTempFilters(prev => ({
-                                        ...prev,
-                                        brand: prev.brand === item.label ? null : item.label,
-                                    }))
-                                }
-                                labelKey="label"
-                            />
-                        )}
-                    />
-                ) : (
-                    <Text className="text-sm text-gray-500 mx-4 mt-2">
-                        No brands available
-                    </Text>
-                )}
-
-                <Text className="text-lg font-rubik-bold text-gray-800 mt-5 mx-4">
-                    Budget
-                </Text>
-                {budgets.length > 0 ? (
-                    <FlatList
-                        data={budgets}
-                        horizontal={true}
-                        showsHorizontalScrollIndicator={false}
-                        keyExtractor={(item, index) => `budget-${index}`}
-                        keyboardShouldPersistTaps="handled"
-                        style={{ marginTop: 10, marginStart: 10 }}
-                        renderItem={({ item }) => (
-                            <FilterChip
-                                item={item}
-                                isSelected={tempFilters.budget === item.label}
-                                onPress={() =>
-                                    setTempFilters(prev => ({
-                                        ...prev,
-                                        budget: prev.budget === item.label ? null : item.label,
-                                    }))
-                                }
-                                labelKey="label"
-                            />
-                        )}
-                    />
-                ) : (
-                    <Text className="text-sm text-gray-500 mx-4 mt-2">
-                        No budgets available
-                    </Text>
-                )}
-
-                <Text className="text-lg font-rubik-bold text-gray-800 mt-5 mx-4">
-                    Transmission
-                </Text>
-                {transmissions.length > 0 ? (
-                    <FlatList
-                        data={transmissions}
-                        horizontal={true}
-                        showsHorizontalScrollIndicator={false}
-                        keyExtractor={(item, index) => `transmission-${index}`}
-                        keyboardShouldPersistTaps="handled"
-                        style={{ marginTop: 10, marginStart: 10 }}
-                        renderItem={({ item }) => (
-                            <FilterChip
-                                item={item}
-                                isSelected={tempFilters.transmission === item.label}
-                                onPress={() =>
-                                    setTempFilters(prev => ({
-                                        ...prev,
-                                        transmission: prev.transmission === item.label ? null : item.label,
-                                    }))
-                                }
-                                labelKey="value"
-                                icon={
-                                    item.label.toLowerCase() === "automatic"
-                                        ? "car-sport"
-                                        : "cog"
-                                }
-                            />
-                        )}
-                    />
-                ) : (
-                    <Text className="text-sm text-gray-500 mx-4 mt-2">
-                        No transmissions available
-                    </Text>
-                )}
-
-                <Text className="text-lg font-rubik-bold text-gray-800 mt-5 mx-4">
-                    Fuel Type
-                </Text>
-                {fuelTypes.length > 0 ? (
-                    <FlatList
-                        data={fuelTypes}
-                        horizontal={true}
-                        showsHorizontalScrollIndicator={false}
-                        keyExtractor={(item) => `fueltype-${item.id}`}
-                        keyboardShouldPersistTaps="handled"
-                        style={{ marginTop: 10, marginStart: 10 }}
-                        renderItem={({ item }) => (
-                            <FilterChip
-                                item={item}
-                                isSelected={tempFilters.fuelType === item.label}
-                                onPress={() =>
-                                    setTempFilters(prev => ({
-                                        ...prev,
-                                        fuelType: prev.fuelType === item.label ? null : item.label,
-                                    }))
-                                }
-                                labelKey="label"
-                                icon={
-                                    item.label.toLowerCase().includes("petrol")
-                                        ? "water"
-                                        : item.label.toLowerCase().includes("diesel")
-                                            ? "water"
-                                            : item.label.toLowerCase().includes("cng")
-                                                ? "leaf"
-                                                : "flash"
-                                }
-                            />
-                        )}
-                    />
-                ) : (
-                    <Text className="text-sm text-gray-500 mx-4 mt-2">
-                        No fuel types available
-                    </Text>
-                )}
-
-                <Text className="text-lg font-rubik-bold text-gray-800 mt-5 mx-4">
-                    Body Type
-                </Text>
-                {bodyTypes.length > 0 ? (
-                    <FlatList
-                        data={bodyTypes}
-                        horizontal={true}
-                        showsHorizontalScrollIndicator={false}
-                        keyExtractor={(item) => `bodytype-${item.id}`}
-                        keyboardShouldPersistTaps="handled"
-                        style={{ marginTop: 10, marginStart: 10 }}
-                        renderItem={({ item }) => (
-                            <FilterChip
-                                item={item}
-                                isSelected={tempFilters.bodyType === item.label}
-                                onPress={() =>
-                                    setTempFilters(prev => ({
-                                        ...prev,
-                                        bodyType: prev.bodyType === item.label ? null : item.label,
-                                    }))
-                                }
-                                labelKey="label"
-                            />
-                        )}
-                    />
-                ) : (
-                    <Text className="text-sm text-gray-500 mx-4 mt-2">
-                        No body types available
-                    </Text>
-                )}
-
-                <TouchableOpacity
-                    onPress={handleSearch}
-                    style={styles.applyButton}
-                    accessibilityLabel="Apply search filters"
-                >
-                    <LinearGradient
-                        colors={["#0061ff", "#003087"]}
-                        style={styles.applyButtonGradient}
-                    >
-                        {loading ? (
-                            <ActivityIndicator color="#fff" />
-                        ) : (
-                            <Text className="font-rubik-bold text-white text-center text-lg">
-                                Apply Filters
-                            </Text>
-                        )}
+                                <LinearGradient
+                                    colors={["#ff4444", "#cc0000"]}
+                                    style={styles.headerButtonGradient}
+                                >
+                                    <Text className="text-sm font-rubik-medium text-white">
+                                        Close
+                                    </Text>
+                                </LinearGradient>
+                            </TouchableOpacity>
+                        </View>
                     </LinearGradient>
-                </TouchableOpacity>
-            </View>
-        </RBSheet>
-    </View>
-);
+
+                    <Text className="text-lg font-rubik-bold text-gray-800 mt-5 mx-4">
+                        Search by Brand
+                    </Text>
+                    {brands.length > 0 ? (
+                        <FlatList
+                            data={brands}
+                            horizontal={true}
+                            showsHorizontalScrollIndicator={false}
+                            keyExtractor={(item) => `brand-${item.id}`}
+                            keyboardShouldPersistTaps="handled"
+                            style={{ marginTop: 10, marginStart: 10 }}
+                            renderItem={({ item }) => (
+                                <FilterChip
+                                    item={item}
+                                    isSelected={tempFilters.brand === item.label}
+                                    onPress={() =>
+                                        setTempFilters(prev => ({
+                                            ...prev,
+                                            brand: prev.brand === item.label ? null : item.label,
+                                        }))
+                                    }
+                                    labelKey="label"
+                                />
+                            )}
+                        />
+                    ) : (
+                        <Text className="text-sm text-gray-500 mx-4 mt-2">
+                            No brands available
+                        </Text>
+                    )}
+
+                    <Text className="text-lg font-rubik-bold text-gray-800 mt-5 mx-4">
+                        Budget
+                    </Text>
+                    {budgets.length > 0 ? (
+                        <FlatList
+                            data={budgets}
+                            horizontal={true}
+                            showsHorizontalScrollIndicator={false}
+                            keyExtractor={(item, index) => `budget-${index}`}
+                            keyboardShouldPersistTaps="handled"
+                            style={{ marginTop: 10, marginStart: 10 }}
+                            renderItem={({ item }) => (
+                                <FilterChip
+                                    item={item}
+                                    isSelected={tempFilters.budget === item.label}
+                                    onPress={() =>
+                                        setTempFilters(prev => ({
+                                            ...prev,
+                                            budget: prev.budget === item.label ? null : item.label,
+                                        }))
+                                    }
+                                    labelKey="label"
+                                />
+                            )}
+                        />
+                    ) : (
+                        <Text className="text-sm text-gray-500 mx-4 mt-2">
+                            No budgets available
+                        </Text>
+                    )}
+
+                    <Text className="text-lg font-rubik-bold text-gray-800 mt-5 mx-4">
+                        Transmission
+                    </Text>
+                    {transmissions.length > 0 ? (
+                        <FlatList
+                            data={transmissions}
+                            horizontal={true}
+                            showsHorizontalScrollIndicator={false}
+                            keyExtractor={(item, index) => `transmission-${index}`}
+                            keyboardShouldPersistTaps="handled"
+                            style={{ marginTop: 10, marginStart: 10 }}
+                            renderItem={({ item }) => (
+                                <FilterChip
+                                    item={item}
+                                    isSelected={tempFilters.transmission === item.label}
+                                    onPress={() =>
+                                        setTempFilters(prev => ({
+                                            ...prev,
+                                            transmission: prev.transmission === item.label ? null : item.label,
+                                        }))
+                                    }
+                                    labelKey="value"
+                                    icon={
+                                        item.label.toLowerCase() === "automatic"
+                                            ? "car-sport"
+                                            : "cog"
+                                    }
+                                />
+                            )}
+                        />
+                    ) : (
+                        <Text className="text-sm text-gray-500 mx-4 mt-2">
+                            No transmissions available
+                        </Text>
+                    )}
+
+                    <Text className="text-lg font-rubik-bold text-gray-800 mt-5 mx-4">
+                        Fuel Type
+                    </Text>
+                    {fuelTypes.length > 0 ? (
+                        <FlatList
+                            data={fuelTypes}
+                            horizontal={true}
+                            showsHorizontalScrollIndicator={false}
+                            keyExtractor={(item) => `fueltype-${item.id}`}
+                            keyboardShouldPersistTaps="handled"
+                            style={{ marginTop: 10, marginStart: 10 }}
+                            renderItem={({ item }) => (
+                                <FilterChip
+                                    item={item}
+                                    isSelected={tempFilters.fuelType === item.label}
+                                    onPress={() =>
+                                        setTempFilters(prev => ({
+                                            ...prev,
+                                            fuelType: prev.fuelType === item.label ? null : item.label,
+                                        }))
+                                    }
+                                    labelKey="label"
+                                    icon={
+                                        item.label.toLowerCase().includes("petrol")
+                                            ? "water"
+                                            : item.label.toLowerCase().includes("diesel")
+                                                ? "water"
+                                                : item.label.toLowerCase().includes("cng")
+                                                    ? "leaf"
+                                                    : "flash"
+                                    }
+                                />
+                            )}
+                        />
+                    ) : (
+                        <Text className="text-sm text-gray-500 mx-4 mt-2">
+                            No fuel types available
+                        </Text>
+                    )}
+
+                    <Text className="text-lg font-rubik-bold text-gray-800 mt-5 mx-4">
+                        Body Type
+                    </Text>
+                    {bodyTypes.length > 0 ? (
+                        <FlatList
+                            data={bodyTypes}
+                            horizontal={true}
+                            showsHorizontalScrollIndicator={false}
+                            keyExtractor={(item) => `bodytype-${item.id}`}
+                            keyboardShouldPersistTaps="handled"
+                            style={{ marginTop: 10, marginStart: 10 }}
+                            renderItem={({ item }) => (
+                                <FilterChip
+                                    item={item}
+                                    isSelected={tempFilters.bodyType === item.label}
+                                    onPress={() =>
+                                        setTempFilters(prev => ({
+                                            ...prev,
+                                            bodyType: prev.bodyType === item.label ? null : item.label,
+                                        }))
+                                    }
+                                    labelKey="label"
+                                />
+                            )}
+                        />
+                    ) : (
+                        <Text className="text-sm text-gray-500 mx-4 mt-2">
+                            No body types available
+                        </Text>
+                    )}
+
+                    <TouchableOpacity
+                        onPress={handleSearch}
+                        style={styles.applyButton}
+                        accessibilityLabel="Apply search filters"
+                    >
+                        <LinearGradient
+                            colors={["#0061ff", "#003087"]}
+                            style={styles.applyButtonGradient}
+                        >
+                            {loading ? (
+                                <ActivityIndicator color="#fff" />
+                            ) : (
+                                <Text className="font-rubik-bold text-white text-center text-lg">
+                                    Apply Filters
+                                </Text>
+                            )}
+                        </LinearGradient>
+                    </TouchableOpacity>
+                </View>
+            </RBSheet>
+        </View>
+    );
 };
 
 const styles = StyleSheet.create({
-searchBar: {
-    marginHorizontal: 15,
-    marginVertical: 5,
-    borderRadius: 50,
-},
-searchBarGradient: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 15,
-    paddingVertical: 12,
-    borderRadius: 50,
-    borderWidth: 1,
-    borderColor: "#ddd",
-},
-header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 15,
-    borderRadius: 0,
-},
-headerButton: {
-    borderRadius: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-},
-headerButtonGradient: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-},
-applyButton: {
-    marginTop: 20,
-    borderRadius: 12,
-},
-applyButtonGradient: {
-    paddingVertical: 12,
-    borderRadius: 12,
-    alignItems: "center",
-    marginInline: 15,
-},
-loadingOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(255, 255, 255, 0.8)",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 1000,
-},
+    searchBar: {
+        marginHorizontal: 15,
+        marginVertical: 5,
+        borderRadius: 50,
+    },
+    searchBarGradient: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        paddingHorizontal: 15,
+        paddingVertical: 12,
+        borderRadius: 50,
+        borderWidth: 1,
+        borderColor: "#ddd",
+    },
+    header: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        padding: 15,
+        borderRadius: 0,
+    },
+    headerButton: {
+        borderRadius: 8,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+    headerButtonGradient: {
+        paddingVertical: 6,
+        paddingHorizontal: 12,
+        borderRadius: 8,
+    },
+    applyButton: {
+        marginTop: 20,
+        borderRadius: 12,
+    },
+    applyButtonGradient: {
+        paddingVertical: 12,
+        borderRadius: 12,
+        alignItems: "center",
+        marginInline: 15,
+    },
+    loadingOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: "rgba(255, 255, 255, 0.8)",
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 1000,
+    },
 });
 
 export default Search;

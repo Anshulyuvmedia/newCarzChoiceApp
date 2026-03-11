@@ -8,7 +8,6 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast, { BaseToast } from 'react-native-toast-message';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 
 const EditProfile = () => {
     // Initialize state with defaults as empty, to be updated from AsyncStorage
@@ -24,12 +23,6 @@ const EditProfile = () => {
     const [pincode, setPincode] = useState('');
     const [state, setState] = useState('');
     const [address, setAddress] = useState('');
-
-    // Animation for buttons
-    const buttonScale = useSharedValue(1);
-    const buttonAnimatedStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: withSpring(buttonScale.value) }],
-    }));
 
     // Load defaults from AsyncStorage on mount
     useEffect(() => {
@@ -279,18 +272,18 @@ const EditProfile = () => {
                 });
             }
 
-            // console.log('Submitting FormData for userId:', userId);
-            // console.log('FormData fields:', {
-            //     fullname: username,
-            //     email,
-            //     contactno: phoneNumber,
-            //     district,
-            //     pincode,
-            //     state,
-            //     addresss: address,
-            //     usertype,
-            //     hasImage: !!image && image.startsWith('file://'),
-            // });
+            console.log('Submitting FormData for userId:', userId);
+            console.log('FormData fields:', {
+                fullname: username,
+                email,
+                contactno: phoneNumber,
+                district,
+                pincode,
+                state,
+                addresss: address,
+                usertype,
+                hasImage: !!image && image.startsWith('file://'),
+            });
 
             const response = await axios.post(
                 `https://carzchoice.com/api/updateuserprofile/${userId}`,
@@ -337,9 +330,9 @@ const EditProfile = () => {
                 error.response?.data?.message?.includes('Class')
                     ? 'Image upload failed due to server configuration.'
                     : error.response?.data?.message ||
-                      (error.message === 'timeout of 10000ms exceeded'
-                          ? 'Request timed out. Please check your network.'
-                          : 'Could not update profile. Please try again.');
+                    (error.message === 'timeout of 10000ms exceeded'
+                        ? 'Request timed out. Please check your network.'
+                        : 'Could not update profile. Please try again.');
 
             Toast.show({
                 type: 'error',
@@ -523,7 +516,7 @@ const EditProfile = () => {
                 </ScrollView>
             )}
 
-            <Animated.View style={[buttonAnimatedStyle]}>
+            <View>
                 <TouchableOpacity
                     onPress={() => {
                         buttonScale.value = 0.95;
@@ -545,7 +538,7 @@ const EditProfile = () => {
                         )}
                     </LinearGradient>
                 </TouchableOpacity>
-            </Animated.View>
+            </View>
         </View>
     );
 };

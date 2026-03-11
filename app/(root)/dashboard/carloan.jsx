@@ -310,6 +310,7 @@ const CarLoan = () => {
                                                     key: index.toString(),
                                                 })) || []}
                                                 style={pickerSelectStyles}
+                                                placeholderTextColor="#888"
                                                 placeholder={{ label: 'Choose an option...', value: null }}
                                             />
                                         </View>

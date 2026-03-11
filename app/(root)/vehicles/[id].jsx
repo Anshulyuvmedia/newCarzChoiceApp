@@ -165,20 +165,23 @@ const CarDetails = () => {
                 let parsedSpecifications = [];
                 let parsedFeatures = [];
 
-                // console.log('apidata', response.data.data.variantsfaqs);
+                // console.log('apidata', apiData.specifications);
 
                 try {
                     if (Array.isArray(apiData.specifications) && apiData.specifications.length > 0) {
-                        let parsedSpecData = JSON.parse(apiData.specifications[0]);
-                        if (Array.isArray(parsedSpecData)) {
-                            parsedSpecifications = parsedSpecData.map((spec) => ({
-                                name: spec.type || "Unknown",
-                                details: [{
-                                    label: spec.label || "N/A",
-                                    value: spec.value || "N/A"
-                                }]
-                            }));
-                        }
+
+                        const parsedSpecData = JSON.parse(apiData.specifications[0]);
+
+                        // console.log("parsedSpecData", parsedSpecData);
+
+                        parsedSpecifications = Object.entries(parsedSpecData).map(([section, items]) => ({
+                            name: section,
+                            details: items.map(item => ({
+                                label: item.name || "N/A",
+                                value: item.value || "N/A"
+                            }))
+                        }));
+
                     }
                 } catch (error) {
                     console.error("❌ Error parsing specifications:", error);
@@ -186,15 +189,24 @@ const CarDetails = () => {
 
                 try {
                     let rawFeatures = apiData.features;
-                    if (Array.isArray(rawFeatures) && rawFeatures.length > 0 && typeof rawFeatures[0] === "string") {
+
+                    // If API returns array with JSON string
+                    if (Array.isArray(rawFeatures) && rawFeatures.length > 0) {
                         rawFeatures = JSON.parse(rawFeatures[0]);
                     }
-                    if (Array.isArray(rawFeatures)) {
-                        parsedFeatures = rawFeatures.map((feature) => ({
-                            name: feature?.type || "Unknown",
-                            details: Array.isArray(feature?.label) ? feature.label : []
+
+                    // console.log("rawFeatures", rawFeatures);
+
+                    if (rawFeatures && typeof rawFeatures === "object") {
+                        parsedFeatures = Object.entries(rawFeatures).map(([section, items]) => ({
+                            name: section,
+                            details: items.map(item => ({
+                                label: item.name || "N/A",
+                                value: item.value
+                            }))
                         }));
                     }
+
                 } catch (error) {
                     console.error("❌ Error parsing features:", error);
                 }

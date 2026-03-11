@@ -1,3 +1,4 @@
+// app/_layout.jsx
 import { SplashScreen, Stack, useRouter } from "expo-router";
 import { useFonts } from "expo-font";
 import { useEffect, useState } from "react";
@@ -6,7 +7,7 @@ import './globals.css';
 import Toast from 'react-native-toast-message';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context'
-
+import { LocationProvider } from "@/components/LocationContext";
 
 export default function RootLayout() {
     const [fontsLoaded] = useFonts({
@@ -68,8 +69,9 @@ export default function RootLayout() {
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
             <StatusBar style="dark" backgroundColor="#ffffff" />
-
-            <Stack screenOptions={{ headerShown: false }} />
+            <LocationProvider>
+                <Stack screenOptions={{ headerShown: false }} />
+            </LocationProvider>
             <Toast />
         </SafeAreaView>
     );

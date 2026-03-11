@@ -222,7 +222,7 @@ const Signup = () => {
 
           <TouchableOpacity onPress={() => router.push('/signin')} style={styles.loginLink}>
             <Text style={styles.loginText}>
-              Already have an account? <Text style={styles.highlight}>Login now!</Text>
+              Already have an account?  <Text style={styles.highlight}>Login now!</Text>
             </Text>
           </TouchableOpacity>
         </View>
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     height: 45,
     borderColor: '#ccc',
     borderWidth: 1,
-    borderRadius: 5,
+    borderRadius: 25,
     paddingHorizontal: 10,
     marginBottom: 6,
     fontFamily: 'Rubik-Regular',

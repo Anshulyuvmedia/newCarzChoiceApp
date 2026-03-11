@@ -416,12 +416,13 @@ const RegisterDealer = () => {
                         <View className="flex my-5 shadow rounded-lg bg-white p-5">
 
                             <Text style={[styles.label, errors.businessName && { color: 'red' }]}>Business Name</Text>
-                            <TextInput style={styles.input} placeholder="Enter Business Name" onChangeText={setBusinessName} value={businessName} />
+                            <TextInput style={styles.input} placeholderTextColor="#888" placeholder="Enter Business Name" onChangeText={setBusinessName} value={businessName} />
 
                             <Text style={[styles.label, errors.whatsappNumber && { color: 'red' }]}>WhatsApp No.</Text>
                             <TextInput
                                 style={styles.input}
                                 placeholder="Enter Whatsapp Number"
+                                placeholderTextColor="#888"
                                 keyboardType="numeric"
                                 onChangeText={(text) => {
                                     const numericValue = text.replace(/[^0-9]/g, '');
@@ -479,6 +480,7 @@ const RegisterDealer = () => {
                                                 citySearch(text);
                                             }}
                                             placeholder="Select Your City..."
+                                            placeholderTextColor="#888"
                                             className="flex-1 ml-2 text-black-300 text-sm capitalize"
                                         />
                                     </View>
@@ -518,6 +520,7 @@ const RegisterDealer = () => {
                                 style={styles.input}
                                 value={stateData} // Show state value
                                 // editable={false} // Prevent user from modifying state
+                                placeholderTextColor="#888"
                                 placeholder='Enter state...'
                                 onChangeText={(text) => {
                                     setState(text);

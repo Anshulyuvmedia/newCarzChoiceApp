@@ -57,7 +57,7 @@ const CompareScreen = () => {
             }
 
             const result = await response.json();
-
+            // console.log('result', result);
             if (result.success) {
                 const { variant1, variant2 } = result.data;
 
@@ -75,50 +75,51 @@ const CompareScreen = () => {
                         ? (parseInt(variant.price) / 100000).toFixed(2)
                         : 'N/A';
 
+                    let specsRaw = variant.specifications || {};
+
+                    if (Array.isArray(specsRaw)) {
+                        specsRaw = specsRaw.reduce((acc, item) => ({ ...acc, ...item }), {});
+                    }
+
                     const groupedSpecs = {};
-                    (variant.specifications || []).forEach(spec => {
-                        if (spec.label && spec.value) {
-                            if (!groupedSpecs[spec.type]) {
-                                groupedSpecs[spec.type] = [];
-                            }
-                            groupedSpecs[spec.type].push({
-                                label: spec.label,
-                                value: spec.value,
-                            });
+
+                    Object.entries(specsRaw).forEach(([section, items]) => {
+                        if (Array.isArray(items)) {
+                            groupedSpecs[section] = items.map(item => ({
+                                label: item?.name || 'N/A',
+                                value: item?.value || 'N/A'
+                            }));
+                        } else {
+                            groupedSpecs[section] = [];
                         }
                     });
 
+                    let featuresRaw = variant.features || {};
+
+                    if (Array.isArray(featuresRaw)) {
+                        featuresRaw = featuresRaw.reduce((acc, item) => ({ ...acc, ...item }), {});
+                    }
+
                     const groupedFeatures = {};
-                    const featuresArray = variant.features || [];
 
-                    featuresArray.forEach((featureGroup, index) => {
-                        if (typeof featureGroup === 'string') {
-                            groupedFeatures['General'] = groupedFeatures['General'] || [];
-                            groupedFeatures['General'].push({
-                                label: featureGroup,
-                                value: featureGroup === 'Feature not available' ? 'Yes' : 'No',
-                            });
-                        } else if (featureGroup && featureGroup.label && featureGroup.type && featureGroup.value) {
-                            const featuresList = [];
-                            const labels = Array.isArray(featureGroup.label) ? featureGroup.label : [featureGroup.label];
-                            const values = Array.isArray(featureGroup.value) ? featureGroup.value : [featureGroup.value];
-
-                            labels.forEach((label, idx) => {
-                                const value = values[idx] || '0';
-                                featuresList.push({
-                                    label,
-                                    value: value === '1' || value === 'Yes' || value === '1 beep over 80kmph, Continuous beeps over 120kmph' ? 'Yes' : 'No',
-                                });
-                            });
-
-                            groupedFeatures[featureGroup.type] = featuresList;
+                    Object.entries(featuresRaw).forEach(([section, items]) => {
+                        if (Array.isArray(items)) {
+                            groupedFeatures[section] = items.map(item => ({
+                                label: item?.name || 'N/A',
+                                value:
+                                    item?.value === 1
+                                        ? 'Yes'
+                                        : item?.value === 0
+                                            ? 'No'
+                                            : item?.value ?? 'N/A',
+                            }));
                         } else {
-                            console.warn(`Unexpected feature format at index ${index}:`, featureGroup);
+                            groupedFeatures[section] = [];
                         }
                     });
 
                     if (Object.keys(groupedFeatures).length === 0) {
-                        groupedFeatures['General'] = [{ label: 'Feature not available', value: 'Yes' }];
+                        groupedFeatures['General'] = [{ label: 'Feature not available', value: 'No' }];
                     }
 
                     return {
@@ -400,29 +401,45 @@ const CompareScreen = () => {
                         </TouchableOpacity>
                         {specSubSections[type] && (
                             <View style={styles.sectionContent}>
-                                {(variant1Data.specifications[type] || variant2Data.specifications[type] || []).map((spec) => {
-                                    const variant1Value = (variant1Data.specifications[type] || []).find(s => s.label === spec.label)?.value || 'N/A';
-                                    const variant2Value = (variant2Data.specifications[type] || []).find(s => s.label === spec.label)?.value || 'N/A';
-                                    const isSame = variant1Value === variant2Value;
+                                {specSubSections[type] && (
+                                    <View style={styles.sectionContent}>
+                                        {(() => {
+                                            const specLabels = [
+                                                ...new Set([
+                                                    ...(variant1Data.specifications[type] || []).map(s => s.label),
+                                                    ...(variant2Data.specifications[type] || []).map(s => s.label),
+                                                ])
+                                            ];
 
-                                    if (hideSimilar && isSame) {
-                                        return null;
-                                    }
+                                            return specLabels.map((label) => {
+                                                const variant1Value =
+                                                    (variant1Data.specifications[type] || []).find(s => s.label === label)?.value || 'N/A';
 
-                                    return (
-                                        <View
-                                            key={spec.label}
-                                            className="flex border-b border-gray-100 pt-3"
-                                            style={[highlightDifferences && !isSame && styles.highlightedRow]}
-                                        >
-                                            <Text style={styles.specLabel}>{spec.label}</Text>
-                                            <View key={`${spec.label}-values`} style={styles.specRow}>
-                                                <Text style={styles.specValue1}>{variant1Value}</Text>
-                                                <Text style={styles.specValue2}>{variant2Value}</Text>
-                                            </View>
-                                        </View>
-                                    );
-                                })}
+                                                const variant2Value =
+                                                    (variant2Data.specifications[type] || []).find(s => s.label === label)?.value || 'N/A';
+
+                                                const isSame = variant1Value === variant2Value;
+
+                                                if (hideSimilar && isSame) return null;
+
+                                                return (
+                                                    <View
+                                                        key={label}
+                                                        className="flex border-b border-gray-100 pt-3"
+                                                        style={[highlightDifferences && !isSame && styles.highlightedRow]}
+                                                    >
+                                                        <Text style={styles.specLabel}>{label}</Text>
+
+                                                        <View style={styles.specRow}>
+                                                            <Text style={styles.specValue1}>{variant1Value}</Text>
+                                                            <Text style={styles.specValue2}>{variant2Value}</Text>
+                                                        </View>
+                                                    </View>
+                                                );
+                                            });
+                                        })()}
+                                    </View>
+                                )}
                             </View>
                         )}
                     </View>
