@@ -392,7 +392,11 @@ const EditProfile = () => {
                     <View style={styles.profileCard}>
                         <View style={styles.profileImageContainer}>
                             <Image
-                                source={image ? { uri: image } : images.avatar}
+                                source={
+                                    typeof image === 'string'
+                                        ? { uri: image }
+                                        : image || images.avatar
+                                }
                                 style={styles.profileImage}
                             />
                             <TouchableOpacity
@@ -518,11 +522,7 @@ const EditProfile = () => {
 
             <View>
                 <TouchableOpacity
-                    onPress={() => {
-                        buttonScale.value = 0.95;
-                        handleSubmit();
-                        setTimeout(() => { buttonScale.value = 1; }, 150);
-                    }}
+                    onPress={handleSubmit}
                     style={styles.submitButton}
                     disabled={loading}
                     activeOpacity={0.9}
